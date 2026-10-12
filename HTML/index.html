@@ -1,0 +1,1447 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מרכז הניהול במאוחדת</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#2b33d6; --blue2:#3f6bff; --blue3:#5b8cff; --navy:#16196b; --ink:#23264f; --muted:#5d628a;
+  --orange:#f7801e; --orange2:#ffa24a; --bg:#f2f5fd; --card:#ffffff; --line:#e3e8f7; --soft:#eef2ff;
+  --shadow:0 10px 30px rgba(38,48,150,.10); --shadow2:0 18px 50px rgba(38,48,150,.18);
+  --grad:linear-gradient(115deg,#4a6dff 0%,#2b33d6 45%,#2a1fb8 100%);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0d1140;font-family:'Heebo',Arial,sans-serif;color:var(--ink);overflow:hidden}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;margin:-360px 0 0 -640px;transform-origin:center center;overflow:hidden;background:var(--bg)}
+.screen{position:absolute;inset:0;display:none;overflow:hidden}
+.screen.active{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+
+/* ---------- decorative backgrounds ---------- */
+.bgsoft{position:absolute;inset:0;background:
+  radial-gradient(520px 320px at 8% 92%,rgba(91,140,255,.16),transparent 70%),
+  radial-gradient(420px 300px at 96% 100%,rgba(140,110,255,.12),transparent 70%),
+  linear-gradient(180deg,#f6f8ff,#eef2fc);}
+.blob{position:absolute;border-radius:50%;filter:blur(0);pointer-events:none}
+
+/* ---------- top bar ---------- */
+.topbar{position:absolute;top:0;left:0;right:0;height:64px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 40px;box-shadow:0 2px 14px rgba(30,40,120,.06);z-index:5}
+.topbar .logo{height:38px;cursor:pointer}
+.crumbs{flex:1;margin-right:28px;font-size:15px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.crumbs b{color:var(--navy);font-weight:700}
+.crumbs a{color:var(--blue);cursor:pointer;text-decoration:none;font-weight:500}
+.homebtn{display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;background:var(--soft);color:var(--navy);font-weight:600;font-size:15px;transition:.2s}
+.homebtn:hover{background:#dfe6ff}
+.homebtn.cta{background:linear-gradient(135deg,#ffa24a,#f26f17);color:#fff;font-weight:800;box-shadow:0 8px 20px rgba(247,128,30,.45);animation:ctaPulse 1.8s ease-in-out infinite}
+.homebtn.cta:hover{background:linear-gradient(135deg,#ffb35f,#f7801e)}
+.homebtn.cta svg{animation:ctaHop 1.8s ease-in-out infinite}
+@keyframes ctaPulse{0%,100%{box-shadow:0 8px 20px rgba(247,128,30,.45),0 0 0 0 rgba(247,128,30,.55)}50%{box-shadow:0 8px 20px rgba(247,128,30,.45),0 0 0 10px rgba(247,128,30,0)}}
+@keyframes ctaHop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-3px)}}
+.homebtn svg{width:18px;height:18px}
+
+/* ---------- page head band ---------- */
+.phead{position:absolute;top:64px;left:0;right:0;height:156px;background:var(--grad);color:#fff;padding:26px 56px 0;overflow:hidden}
+.phead:after{content:"";position:absolute;left:-5%;right:-5%;bottom:-60px;height:90px;background:var(--bg);border-radius:50% 50% 0 0/100% 100% 0 0}
+.phead .b1{position:absolute;width:300px;height:300px;left:-80px;top:-150px;background:rgba(255,255,255,.08)}
+.phead .b2{position:absolute;width:220px;height:220px;left:280px;top:40px;background:rgba(120,160,255,.18)}
+.phead h1{margin:0;font-size:40px;font-weight:800;letter-spacing:-.5px;position:relative;z-index:1;display:flex;align-items:center;gap:14px}
+.phead h1 .ic{width:52px;height:52px;background:#fff;border-radius:14px;display:grid;place-items:center;box-shadow:0 6px 16px rgba(0,0,0,.15)}
+.phead h1 .ic svg{width:38px;height:38px}
+.phead p{margin:8px 0 0;font-size:18px;font-weight:300;opacity:.95;position:relative;z-index:1;max-width:820px}
+.hl{color:var(--orange)}
+
+/* ---------- tabs ---------- */
+.tabs{position:absolute;top:196px;right:56px;display:flex;gap:4px;background:#fff;padding:6px;border-radius:999px;box-shadow:var(--shadow);z-index:4}
+.tab{padding:9px 20px;border-radius:999px;font-weight:600;font-size:15px;color:var(--navy);transition:.2s;white-space:nowrap;position:relative}
+.tab:hover{background:var(--soft)}
+.tab.on{background:var(--grad);color:#fff;box-shadow:0 6px 14px rgba(43,51,214,.3)}
+.tab.seen:not(.on):after{content:"";position:absolute;top:7px;left:9px;width:6px;height:6px;border-radius:50%;background:var(--orange)}
+.pcontent{position:absolute;top:258px;bottom:22px;left:56px;right:56px}
+.panel{display:none;height:100%}
+.panel.on{display:block;animation:fadeIn .35s ease}
+
+/* ---------- generic ---------- */
+.card{background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:22px 24px;position:relative}
+.grid{display:grid;gap:18px}
+h2{margin:0 0 10px;font-size:24px;font-weight:800;color:var(--navy)}
+h3{margin:0 0 8px;font-size:19px;font-weight:700;color:var(--navy)}
+p{margin:0 0 10px;font-size:16px;line-height:1.55}
+.muted{color:var(--muted)}
+.lead{font-size:18px;line-height:1.6;color:var(--ink)}
+.kicker{display:inline-block;font-size:13px;font-weight:700;color:var(--orange);letter-spacing:.5px;margin-bottom:6px}
+.uline{display:block;width:70px;height:4px;border-radius:4px;background:var(--orange);margin:8px 0 14px}
+ul.dots{margin:0;padding:0;list-style:none}
+ul.dots li{position:relative;padding-right:22px;margin-bottom:9px;font-size:16px;line-height:1.45}
+ul.dots li:before{content:"";position:absolute;right:2px;top:8px;width:9px;height:9px;border-radius:50%;background:var(--orange)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:12px 24px;border-radius:999px;font-weight:700;font-size:16px;transition:.2s}
+.btn-o{background:linear-gradient(135deg,#ffa24a,#f7801e);color:#fff;box-shadow:0 8px 18px rgba(247,128,30,.35)}
+.btn-b{background:var(--grad);color:#fff;box-shadow:0 8px 18px rgba(43,51,214,.3)}
+.btn-g{background:#fff;color:var(--navy);box-shadow:var(--shadow)}
+.btn:hover{transform:translateY(-2px)}
+.btn svg{width:18px;height:18px}
+.go{display:inline-flex;align-items:center;gap:10px;color:var(--navy);font-weight:700;font-size:16px}
+.go i{width:30px;height:30px;border-radius:50%;background:var(--orange);display:grid;place-items:center;font-style:normal;color:#fff;transition:.2s}
+.go i svg{width:15px;height:15px}
+.hint{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
+.hint:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--orange);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(247,128,30,.5)}50%{box-shadow:0 0 0 6px rgba(247,128,30,0)}}
+.tip{background:linear-gradient(135deg,#fff4ea,#ffe8d4);border-radius:18px;padding:18px 20px;position:relative;border:1px solid #ffd9b5}
+.tip .t{font-weight:800;color:var(--orange);font-size:18px;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.num{width:38px;height:38px;border-radius:12px;background:var(--grad);color:#fff;font-weight:800;display:grid;place-items:center;font-size:17px;flex:none}
+.num.o{background:linear-gradient(135deg,#ffa24a,#f7801e)}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--soft);color:var(--navy);padding:7px 14px;border-radius:999px;font-size:15px;font-weight:500;margin:0 0 8px 6px}
+.clickcard{cursor:pointer;transition:.25s}
+.clickcard:hover{transform:translateY(-4px);box-shadow:var(--shadow2)}
+.clickcard.done:after{content:"✓";position:absolute;top:12px;left:12px;width:24px;height:24px;border-radius:50%;background:#22b07d;color:#fff;font-size:14px;display:grid;place-items:center;font-weight:700}
+
+/* ---------- modal ---------- */
+.modal-bg{position:absolute;inset:0;background:rgba(14,18,72,.5);backdrop-filter:blur(4px);display:none;z-index:50;align-items:center;justify-content:center}
+.modal-bg.on{display:flex}
+.modal{width:820px;max-height:620px;overflow:auto;background:#fff;border-radius:26px;padding:34px 40px 30px;position:relative;animation:pop .3s ease;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.modal .x{position:absolute;top:16px;left:16px;width:38px;height:38px;border-radius:50%;background:var(--soft);display:grid;place-items:center;color:var(--navy);font-size:22px;line-height:1}
+.modal .x:hover{background:#dfe6ff}
+.modal .mh{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.modal .mh .ic{width:50px;height:50px;border-radius:14px;background:var(--soft);display:grid;place-items:center}
+.modal .mh .ic svg{width:34px;height:34px}
+.toast{position:absolute;bottom:30px;left:50%;transform:translateX(-50%) translateY(30px);background:var(--navy);color:#fff;padding:12px 24px;border-radius:999px;font-size:15px;opacity:0;transition:.3s;z-index:80;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+/* ---------- WELCOME ---------- */
+#welcome{background:#f4f6fe url(assets/welcome-bg.png) center/1280px 720px no-repeat}
+#welcome .wcard{position:absolute;left:578px;top:97px;width:603px;height:533px;background:#fff;border-radius:24px;box-shadow:0 18px 50px rgba(70,80,190,.14);padding:30px 50px 28px;text-align:center;display:flex;flex-direction:column}
+#welcome .wbar{width:100px;height:6px;border-radius:6px;background:var(--orange);margin:6px auto 0;flex:none}
+#welcome .wcard .step{display:none;flex:1;flex-direction:column;align-items:center}
+#welcome .wcard .step.on{display:flex;animation:fadeIn .45s}
+#welcome .wcard h1{font-size:56px;line-height:1.08;margin:30px 0 22px;font-weight:900;color:#141a6e;letter-spacing:-.5px}
+#welcome .wgrad{background:linear-gradient(90deg,#3f6bff,#5a3df0 60%,#7a3cf0);-webkit-background-clip:text;background-clip:text;color:transparent}
+#welcome .wcard p{font-size:21px;line-height:1.5;color:#1e2250;margin:0 0 6px}
+#welcome .wbtn{margin-top:auto;width:296px;height:76px;border-radius:999px;background:linear-gradient(90deg,#7a3cf0,#3f6bff);color:#fff;font-size:24px;font-weight:800;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 13px;box-shadow:0 12px 26px rgba(90,70,230,.35);transition:.2s;flex-direction:row}
+#welcome .wbtn:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(90,70,230,.45)}
+#welcome .wbtn span{flex:1;text-align:center}
+#welcome .wbtn i{width:50px;height:50px;border-radius:50%;background:#fff;color:#6a3cf0;display:grid;place-items:center;font-style:normal}
+#welcome .wbtn i svg{width:24px;height:24px}
+#welcome .s2 h1{font-size:36px;margin:22px 0 14px}
+#welcome .s2 p{font-size:18px;line-height:1.5}
+#welcome .s2 .good{font-weight:800;color:var(--orange);font-size:21px}
+#welcome .s2 .wbtn{height:64px;width:300px;font-size:21px}
+#welcome .s2 .wbtn i{width:44px;height:44px}
+#welcome .wback{position:absolute;bottom:12px;left:22px;font-size:14px;color:var(--muted);font-weight:600}
+#welcome .wback:hover{color:var(--blue)}
+
+/* ---------- HOME ---------- */
+#home .hhead{position:absolute;top:0;left:0;right:0;height:62px;background:#fff;display:flex;align-items:center;padding:0 40px;z-index:3}
+#home .hhead img{height:40px}
+#home .hhead .grow{flex:1}
+#home .hero{position:absolute;top:62px;left:0;right:0;height:260px;background:var(--grad);overflow:hidden}
+#home .hero:after{content:"";position:absolute;left:-10%;right:-10%;bottom:-70px;height:120px;background:#f3f6fd;border-radius:50% 50% 0 0/100% 100% 0 0}
+#home .hero .hb1{position:absolute;width:260px;height:260px;left:-90px;top:-80px;border-radius:50%;background:rgba(120,160,255,.35)}
+#home .hero .hb2{position:absolute;width:340px;height:340px;right:-120px;top:-60px;border-radius:50%;background:rgba(255,255,255,.06)}
+#home .woman{position:absolute;right:0;top:62px;width:420px;z-index:1;-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 20%);mask-image:linear-gradient(90deg,transparent 0%,#000 20%)}
+#home .htitle{position:absolute;top:96px;right:370px;left:260px;text-align:center;color:#fff;z-index:2}
+#home .htitle h1{margin:0;font-size:52px;font-weight:900;letter-spacing:-1px}
+#home .htitle p{margin:4px 0 0;font-size:19px;font-weight:300}
+#home .slogan{position:absolute;top:104px;left:56px;color:#fff;font-size:19px;line-height:1.3;text-align:center;z-index:2}
+#home .slogan:after{content:"";display:block;width:110px;height:3px;border-radius:3px;background:var(--orange);margin:10px auto 0;transform:rotate(-4deg)}
+#home .cards{position:absolute;top:262px;left:80px;right:80px;z-index:3}
+#home .row{display:flex;gap:16px;justify-content:center;margin-bottom:16px}
+.tcard{width:262px;height:200px;background:#fff;border-radius:18px;box-shadow:0 12px 32px rgba(38,48,150,.12);text-align:center;padding:14px 18px 12px;cursor:pointer;transition:.25s;position:relative;display:flex;flex-direction:column;align-items:center}
+.row2 .tcard{width:280px;height:192px}
+.tcard:hover{transform:translateY(-6px);box-shadow:0 20px 44px rgba(38,48,150,.22)}
+.tcard:hover .go i{transform:translateX(-4px)}
+.tcard .ti{width:96px;height:66px;border-radius:50%;background:radial-gradient(closest-side,#e8eeff,rgba(232,238,255,0));display:grid;place-items:center;margin-bottom:4px}
+.tcard .ti svg{width:58px;height:58px}
+.tcard h3{font-size:19px;margin:0 0 4px;line-height:1.15;font-weight:800}
+.tcard p{font-size:14px;line-height:1.35;margin:0;color:var(--muted);flex:1}
+.tcard .go{font-size:15px}
+.tcard .go i{width:26px;height:26px}
+.tcard .seen{position:absolute;top:10px;left:10px;display:none;background:#e6f7ef;color:#16935f;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}
+.tcard.visited .seen{display:block}
+#home .exit{position:absolute;left:36px;bottom:22px;z-index:4}
+#home .prog{position:absolute;right:40px;bottom:26px;z-index:4;display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+#home .prog .bar{width:160px;height:8px;border-radius:8px;background:#dfe5f7;overflow:hidden}
+#home .prog .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffa24a,#f7801e);border-radius:8px;transition:.6s}
+
+/* ---------- leadership wheel ---------- */
+.wheelwrap{display:flex;gap:30px;align-items:center;height:100%}
+.wheel{width:430px;height:430px;flex:none}
+.wheel .q{cursor:pointer;transition:.25s}
+.wheel .q path{transition:.25s}
+.wheel .q:hover path{filter:brightness(1.08)}
+.wheel text{font-family:Heebo;font-weight:800;pointer-events:none}
+.qpanel{flex:1}
+.qpanel .comp{display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:12px;font-size:18px;font-weight:600;color:var(--navy);animation:fadeIn .4s both}
+.qpanel .comp:nth-child(2){animation-delay:.08s}.qpanel .comp:nth-child(3){animation-delay:.16s}
+.qprog{display:flex;align-items:center;gap:6px;margin-top:6px}
+.qprog span{width:34px;height:6px;border-radius:6px;background:#dfe5f7;transition:.3s}
+.qprog span.on{background:var(--orange)}
+.qprog b{font-size:13px;color:var(--muted);font-weight:600;margin-right:8px}
+.qnext{margin-top:14px;display:none}
+.qnext.show{display:inline-flex;animation:pop .4s ease}
+#qtitle{display:flex;align-items:center;gap:12px}
+#qtitle .ico{width:52px;height:52px}
+
+/* ---------- icons ---------- */
+.ico{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#f4f4f6;box-shadow:0 2px 6px rgba(0,0,0,.07);flex:none;vertical-align:middle}
+.ico svg{width:30px;height:30px}
+.ico.sm{width:28px;height:28px;border-radius:9px}.ico.sm svg{width:20px;height:20px}
+.ico.lg{width:54px;height:54px;border-radius:16px}.ico.lg svg{width:38px;height:38px}
+.ico.xl{width:72px;height:72px;border-radius:20px;margin:0 auto 10px;display:grid}.ico.xl svg{width:50px;height:50px}
+.ico.bare{background:none;box-shadow:none}
+.ico[data-white] svg{filter:none}
+.ih{display:flex;align-items:center;gap:10px}
+h3.ih .ico{width:36px;height:36px;border-radius:11px}h3.ih .ico svg{width:26px;height:26px}
+.diag-text .lead{font-size:17px;margin-bottom:8px}
+.diag-text h2{font-size:22px}
+.btn .bi svg,.btn>svg.bi{width:22px;height:22px}
+.smileic svg{width:96px;height:96px;margin:6px auto 0;display:block}
+.mistake .ban svg{width:26px;height:26px}
+.mistake .ban{background:#fff1e6}
+.tipblob b svg{width:22px;height:22px}
+
+/* ---------- self diagnosis ---------- */
+.diag{display:flex;gap:30px;height:100%;align-items:stretch}
+.diag-text{flex:1;background:#fff;border-radius:20px;box-shadow:var(--shadow);padding:30px 36px;display:flex;flex-direction:column;align-items:flex-start}
+.diag-text .btn{margin-top:auto}
+.diag-art{width:500px;flex:none;position:relative}
+.diag-blob{position:absolute;right:30px;top:-6px;width:340px;height:340px;border-radius:44% 56% 52% 48%/48% 42% 58% 52%;background:linear-gradient(150deg,#7c9bff,#5a3df0)}
+.diag-woman{position:absolute;right:50px;top:-26px;width:300px;height:370px;object-fit:cover;object-position:top;border-radius:0 0 150px 150px;-webkit-mask-image:linear-gradient(180deg,#000 80%,transparent);mask-image:linear-gradient(180deg,#000 80%,transparent)}
+.ipad{position:absolute;left:0;bottom:16px;width:270px;height:320px;background:#1d2040;border-radius:26px;padding:12px;box-shadow:0 26px 50px rgba(30,30,90,.35);transform:rotate(-6deg);animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:rotate(-6deg) translateY(0)}50%{transform:rotate(-6deg) translateY(-8px)}}
+.ipad-screen{background:linear-gradient(180deg,#fff,#f3f5ff);border-radius:16px;height:100%;padding:16px 16px 14px;display:flex;flex-direction:column;gap:11px}
+.ipad-top{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--navy);padding-bottom:8px;border-bottom:1px solid var(--line)}
+.ipad-row span{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px}
+.ipad-row i{display:block;height:8px;border-radius:8px;background:#e4e9fb;position:relative;overflow:hidden}
+.ipad-row i:after{content:"";position:absolute;inset:0 0 0 auto;width:var(--v);border-radius:8px;background:linear-gradient(90deg,#f7801e,#5a3df0)}
+.ipad-cta{margin-top:auto;background:linear-gradient(90deg,#7a3cf0,#3f6bff);color:#fff;font-size:13px;font-weight:700;text-align:center;border-radius:999px;padding:9px}
+
+/* ---------- strategy goal with robot ---------- */
+.goalbot{position:relative;margin-top:auto;display:flex;align-items:flex-end;gap:0}
+.goalbot .goal{flex:1;border-radius:18px;padding:14px 18px 14px 22px;position:relative;background:linear-gradient(135deg,#eef2ff,#f5efff)}
+.goalbot .goal:after{content:"";position:absolute;left:-11px;bottom:24px;border:11px solid transparent;border-right-color:#f3f0ff;border-left:0}
+.goalbot img{width:96px;flex:none;margin-right:12px;margin-bottom:-14px;transform-origin:50% 90%;animation:bob 3.4s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(58,47,214,.18))}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-4px) rotate(-2deg)}50%{transform:translateY(-6px) rotate(0)}75%{transform:translateY(-3px) rotate(2deg)}}
+.pop-in{animation:pop .45s ease both;margin-top:8px}
+
+/* ---------- survey chart ---------- */
+.sv-head{display:flex;gap:24px;align-items:center;margin-bottom:14px}
+.sv-head>div:first-child{flex:1}
+.sv-flip{flex:none;background:linear-gradient(135deg,#fff4ea,#ffe8d4);border:1px solid #ffd9b5;border-radius:20px;padding:12px 18px 14px;text-align:center}
+.sv-badge{display:inline-block;background:linear-gradient(135deg,#ffa24a,#f7801e);color:#fff;font-weight:900;font-size:18px;letter-spacing:5px;padding:3px 16px 4px 11px;border-radius:999px;margin-bottom:6px}
+.sv-flip-row{display:flex;align-items:center;gap:14px;justify-content:center}
+.sv-flip-row b{color:var(--orange);font-size:24px}
+.sv-flip-row span{display:flex;flex-direction:column;font-size:30px;font-weight:900;line-height:1.05;color:var(--navy)}
+.sv-flip-row .from{color:#9aa1c9}
+.sv-flip-row small{font-size:12px;font-weight:600;color:var(--muted)}
+.sv-flip-row em{font-style:normal;font-size:12px;font-weight:700;color:var(--orange)}
+.sv-flip-row .from em{color:#9aa1c9}
+.sv-legend{display:flex;align-items:center;gap:18px;font-size:14px;color:var(--muted);font-weight:600;margin:4px 0 8px;padding-top:12px;border-top:1px solid var(--line)}
+.sv-legend .sv-q{flex:1;color:var(--navy);font-weight:800;font-size:16px}
+.sv-legend span{display:flex;align-items:center;gap:6px}
+.sv-legend .k{width:14px;height:14px;border-radius:4px;display:inline-block}
+.k.old{background:#c9d0f7}.k.new{background:linear-gradient(90deg,#6f7dff,#3a2fd6)}
+.sv-row{display:grid;grid-template-columns:150px 1fr;align-items:center;gap:16px;padding:5px 12px;border-radius:14px}
+.sv-row.me{background:linear-gradient(90deg,rgba(255,244,234,.0),#fff4ea)}
+.sv-name{display:flex;align-items:center;justify-content:flex-start;height:40px;font-size:15px;font-weight:700;color:var(--ink)}
+.sv-name img{max-height:30px;max-width:120px;object-fit:contain}
+.sv-bars{display:flex;flex-direction:column;gap:3px}
+.sv-bar{display:flex;align-items:center;gap:8px;height:16px}
+.sv-bar i{display:block;height:100%;width:0;border-radius:4px 2px 2px 4px;flex:none;transition:width .9s cubic-bezier(.2,.8,.2,1);cursor:default}
+.sv-bar.old i{background:#c9d0f7}
+.sv-bar.new i{background:linear-gradient(90deg,#3a2fd6,#6f7dff)}
+.sv-bar span{font-size:13px;font-weight:700;color:var(--muted);opacity:0;transition:opacity .4s .7s}
+.sv-bar.new span{color:var(--navy)}
+.sv-row.me .sv-bar.new span{color:var(--orange);font-size:14px}
+.play .sv-bar span{opacity:1}
+.sv-bar i:hover{filter:brightness(1.1)}
+.sv-note{font-size:12px;color:var(--muted);margin:8px 0 0}
+.tyto-pic{width:280px;height:250px;flex:none;border-radius:22px;background:radial-gradient(circle at 50% 45%,#ffffff,#e9edff 70%);display:grid;place-items:center;overflow:hidden}
+.tyto-pic img{width:250px;animation:bob 4s ease-in-out infinite}
+.jr-intro{display:flex;flex-direction:column;padding:16px 20px}
+.kids-scene{flex:1;min-height:0;display:flex;margin:4px 0 8px;overflow:hidden;border-radius:16px}
+.kids-scene img{width:100%;height:100%;max-height:180px;object-fit:cover;object-position:50% 30%;border-radius:16px;box-shadow:0 8px 20px rgba(30,40,120,.12)}
+.kballoon{animation:bob 3s ease-in-out infinite;transform-origin:215px 80px}
+.dirtitle{display:flex;align-items:center;gap:16px}
+.dirtitle .ico{width:62px;height:62px;border-radius:18px}.dirtitle .ico svg{width:44px;height:44px}
+.dirtitle .bignum{font-size:66px}
+#dircard h2{font-size:23px!important;margin-top:6px!important}
+#dircard .uline{margin:6px 0 10px}
+#dircard ul.dots li{margin-bottom:7px}
+
+/* ---------- strategy ---------- */
+.dirhead{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:14px}
+.dirnav{display:flex;gap:8px;align-items:center;justify-content:center}
+.dirnav button{width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:var(--shadow);font-weight:700;color:var(--navy);font-size:14px;transition:.2s}
+.dirnav button.on{background:var(--grad);color:#fff;transform:scale(1.12)}
+.dirnav button.seen:not(.on){background:#fff4ea;color:var(--orange)}
+.dircard{display:grid;grid-template-columns:1fr 1.05fr;gap:26px;height:318px}
+.dircard .bignum{font-size:84px;font-weight:900;line-height:.9;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.goal{background:var(--soft);border-radius:14px;padding:12px 16px;font-size:16px;line-height:1.5;color:var(--navy);border-right:4px solid var(--orange)}
+.arrowbtn{width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:var(--shadow);display:grid;place-items:center;color:var(--navy);transition:.2s}
+.arrowbtn:hover{background:var(--soft)}
+.arrowbtn svg{width:20px;height:20px}
+.arrowbtn[disabled]{opacity:.35;pointer-events:none}
+
+/* ---------- workplan ---------- */
+.mbo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mbo>div{display:flex;align-items:center;gap:14px;background:#fafafa;border:1px solid #eee;border-radius:16px;padding:12px 14px}
+.mbo b{color:var(--navy);font-size:17px;line-height:1.3}
+.mbo small{display:block;font-weight:500;color:var(--muted);font-size:14px}
+.mbo-go{margin-top:auto;padding-top:14px}
+.mbo-go>div{display:flex;gap:10px;margin-top:8px}
+.mbo-go button{flex:1;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#fff;border:2px solid #ffd9b5;font-weight:700;font-size:15px;color:var(--navy);text-align:right;transition:.2s}
+.mbo-go button:hover{border-color:var(--orange);transform:translateY(-2px);box-shadow:0 8px 18px rgba(247,128,30,.18)}
+.parts{display:flex;align-items:center;gap:8px}
+.parts button{padding:9px 16px;border-radius:999px;background:var(--soft);font-weight:700;font-size:14px;color:var(--navy);transition:.2s}
+.parts button.on{background:linear-gradient(135deg,#ffa24a,#f26f17);color:#fff;box-shadow:0 6px 14px rgba(247,128,30,.3)}
+.wppart{display:none;flex:1}
+.wppart.on{display:block;animation:fadeIn .35s}
+.struct{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid #e8e8ee;border-radius:18px;overflow:hidden;margin-top:6px}
+.struct>div{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 8px 22px;text-align:center;position:relative;background:#fff}
+.struct>div:not(:last-child){border-left:1px solid #e8e8ee}
+.struct>div:nth-child(even){background:#fafafc}
+.struct>div:not(:last-child):after{content:"";position:absolute;left:-9px;top:50%;width:16px;height:16px;background:var(--orange);clip-path:polygon(100% 0,0 50%,100% 100%);transform:translateY(-50%);z-index:2}
+.struct b{font-size:20px;color:var(--navy);font-weight:800}
+.cycle{position:relative;width:760px;height:310px;margin:0 auto}
+.cycle-ring{position:absolute;left:50%;top:0;transform:translateX(-50%);width:440px;height:300px}
+.cnode{position:absolute;width:200px;display:flex;flex-direction:column;align-items:center;text-align:center;cursor:default}
+.cnode .ico{background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.1);border:3px solid #fff;transition:.25s}
+.cnode:hover .ico{border-color:var(--orange);transform:scale(1.08)}
+.cnode b{font-size:16px;color:var(--navy);font-weight:800;margin-top:4px}
+.cnode small{font-size:13.5px;color:var(--muted);line-height:1.35}
+.chev{display:flex;gap:0;direction:rtl}
+.chev div{flex:1;height:110px;background:var(--grad);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;clip-path:polygon(100% 0,14% 0,0 50%,14% 100%,100% 100%,86% 50%);margin-left:-18px;font-size:20px;font-weight:800;padding:0 30px;text-align:center}
+.chev div:first-child{clip-path:polygon(100% 0,14% 0,0 50%,14% 100%,100% 100%)}
+.chev div small{font-size:13px;font-weight:500;opacity:.85}
+.chev div:nth-child(2){background:linear-gradient(115deg,#5272ff,#3646e0)}
+.chev div:nth-child(3){background:linear-gradient(115deg,#6a86ff,#4a5cf0)}
+.chev div:nth-child(4){background:linear-gradient(115deg,#ffb066,#f99236)}
+.chev div:nth-child(5){background:linear-gradient(135deg,#ffa24a,#f7801e)}
+.timeline{position:relative;display:flex;justify-content:space-between;padding:0 10px}
+.timeline:before{content:"";position:absolute;top:44px;right:60px;left:60px;height:4px;background:linear-gradient(90deg,#f7801e,#3f6bff);border-radius:4px}
+.tl{width:200px;text-align:center;position:relative;cursor:pointer}
+.tl .dot{width:88px;height:88px;border-radius:50%;background:#fff;box-shadow:var(--shadow);margin:0 auto 14px;display:grid;place-items:center;position:relative;transition:.25s;border:4px solid #fff}
+.tl .dot svg{width:40px;height:40px}
+.tl:hover .dot,.tl.on .dot{border-color:var(--orange);transform:scale(1.06)}
+.tl .when{font-size:18px;font-weight:800;color:var(--navy)}
+.tl .what{font-size:15px;color:var(--muted);line-height:1.4;margin-top:4px}
+.principle{display:flex;gap:16px;align-items:flex-start}
+.principle .num{width:46px;height:46px;font-size:20px}
+.matrix{display:grid;grid-template-columns:auto 1fr 1fr;grid-template-rows:1fr 1fr auto;gap:8px;width:420px}
+.matrix .c{border-radius:14px;padding:12px;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;text-align:center;min-height:86px}
+.matrix .ax{font-size:13px;color:var(--muted);font-weight:600;display:flex;align-items:center;justify-content:center}
+.smart{display:flex;gap:10px;margin-bottom:16px}
+.smart button{flex:1;padding:12px 6px;border-radius:16px;background:var(--soft);text-align:center;transition:.2s}
+.smart button b{display:block;font-size:30px;font-weight:900;color:var(--blue);line-height:1}
+.smart button span{font-size:13px;color:var(--muted);font-weight:600}
+.smart button.on{background:var(--grad)}
+.smart button.on b,.smart button.on span{color:#fff}
+.yesno{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.yesno div{border-radius:14px;padding:14px 16px;font-size:16px;line-height:1.45}
+.yesno .no{background:#fff0f0;color:#9b2c2c}
+.yesno .yes{background:#eafaf2;color:#17694a}
+.yesno b{display:block;font-size:14px;margin-bottom:4px}
+
+/* ---------- procurement ---------- */
+.steps6{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.step6{background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:18px 20px;display:flex;gap:14px;align-items:center;min-height:118px;font-size:17px;font-weight:600;color:var(--navy);opacity:.0;transform:translateY(10px);transition:.4s}
+.step6.show{opacity:1;transform:none}
+.step6 .num{width:48px;height:48px;font-size:22px}
+.mistake{display:flex;align-items:center;gap:14px;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:14px 18px;margin-bottom:10px;font-size:17px;font-weight:600;color:var(--navy);cursor:pointer;transition:.25s}
+.mistake .ban{width:34px;height:34px;border-radius:50%;background:#ffe9e9;display:grid;place-items:center;flex:none}
+.mistake.x{background:#fff7f7;color:#b42323;text-decoration:line-through;text-decoration-color:rgba(180,35,35,.5)}
+
+/* ---------- performance ---------- */
+.stages{display:flex;gap:18px;align-items:stretch}
+.stg{flex:1;background:#fff;border-radius:20px;box-shadow:var(--shadow);padding:20px 22px;cursor:pointer;transition:.25s;position:relative;border:2px solid transparent}
+.stg.on{border-color:var(--orange);box-shadow:var(--shadow2)}
+.stg .lbl{font-size:13px;font-weight:700;color:var(--orange)}
+.stg h3{font-size:22px}
+.stg .body{font-size:16px;line-height:1.5;color:var(--muted)}
+
+/* ---------- data / rimon ---------- */
+.rimon{position:relative;width:740px;border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.rimon img{width:100%;display:block}
+.rimon .hot{position:absolute;top:0;bottom:0;width:25%;cursor:pointer;transition:.2s;border:3px solid transparent;border-radius:14px}
+.rimon .hot:hover{background:rgba(255,255,255,.12);border-color:rgba(247,128,30,.7)}
+.rimon .hot.on{border-color:var(--orange);background:rgba(255,255,255,.08)}
+.pcar{display:flex;align-items:center;gap:20px;height:100%}
+.pslide{flex:1;height:100%;display:flex;gap:30px;align-items:center}
+.pslide .big{width:180px;height:180px;border-radius:50%;background:var(--grad);display:grid;place-items:center;flex:none;box-shadow:0 18px 40px rgba(43,51,214,.3)}
+.pslide .big svg{width:90px;height:90px}
+
+/* ---------- AI ---------- */
+#ai{background:#f6f6fd url(assets/ai-bg.png) center/1280px 720px no-repeat}
+#ai .ai-actions{position:absolute;right:62px;top:385px;width:420px;display:flex;flex-direction:column;align-items:flex-end;gap:14px;z-index:3}
+#ai .ai-actions .pillcta{margin:0;width:auto}
+.homebtn.floating{position:absolute;top:22px;left:30px;z-index:5;box-shadow:var(--shadow);background:#fff}
+.toolhot{position:absolute;width:128px;height:129px;border-radius:18px;transition:.25s;border:3px solid transparent}
+.toolhot:hover{border-color:rgba(122,60,240,.55);box-shadow:0 18px 36px rgba(90,70,230,.25);transform:translateY(-4px);background:rgba(255,255,255,.08)}
+.toolhot.done:after{content:"✓";position:absolute;top:6px;left:6px;width:22px;height:22px;border-radius:50%;background:#22b07d;color:#fff;font-size:13px;display:grid;place-items:center;font-weight:700}
+.ticon.img{background:#fff;box-shadow:none;overflow:visible}.ticon.img:before{display:none}.ticon.img img{width:100%;height:100%;object-fit:contain}
+.tools{position:absolute;inset:0;z-index:2;pointer-events:none}.tools .toolhot{pointer-events:auto}
+.tool{width:112px;height:118px;background:rgba(255,255,255,.92);border-radius:20px;box-shadow:0 14px 30px rgba(60,70,160,.14);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:15px;color:var(--navy);transition:.25s;position:relative;backdrop-filter:blur(6px)}
+.tool:hover{transform:translateY(-6px) scale(1.03);box-shadow:0 22px 40px rgba(60,70,160,.24)}
+.tool.done:after{content:"✓";position:absolute;top:8px;left:8px;width:20px;height:20px;border-radius:50%;background:#22b07d;color:#fff;font-size:12px;display:grid;place-items:center}
+.ticon{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:28px;position:relative;box-shadow:0 6px 14px rgba(0,0,0,.18);overflow:hidden}
+.ticon:before{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.35),transparent 55%)}
+.ticon span{position:relative}
+.aititle{position:absolute;right:60px;top:120px;width:470px}
+.aititle .bar{width:70px;height:5px;border-radius:5px;background:var(--orange);margin-bottom:16px;margin-right:auto;margin-left:0}
+.aititle h1{margin:0;font-size:78px;font-weight:900;color:var(--navy);line-height:1}
+.aigrad{background:linear-gradient(120deg,#3f6bff,#7a3cf0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.aititle h2{font-size:34px;margin:4px 0 16px;font-weight:800}
+.aititle p{font-size:20px;color:var(--muted);line-height:1.5}
+.pillcta{margin-top:20px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:18px 22px;border-radius:999px;background:linear-gradient(100deg,#7a3cf0,#3f6bff);color:#fff;font-size:20px;font-weight:600;box-shadow:0 14px 30px rgba(90,70,230,.35);transition:.2s}
+.pillcta:hover{transform:translateY(-2px)}
+.pillcta.alt{background:#fff;color:var(--navy);box-shadow:var(--shadow);font-size:17px;padding:13px 20px}
+
+/* AI tool screen */
+.aitool .aih{position:absolute;top:80px;right:60px;left:300px;display:flex;align-items:center;justify-content:space-between;flex-direction:row}
+.aitool .aih h1{margin:0;font-size:34px;font-weight:900;color:var(--navy)}
+.badge{display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,#eef2ff,#fff3e9);padding:8px 8px 8px 22px;border-radius:18px;box-shadow:var(--shadow)}
+.badge .ticon{width:48px;height:48px;font-size:24px}
+.badge b{font-size:22px;color:var(--navy);font-weight:800}
+.badge small{display:block;font-size:14px;color:var(--muted);font-weight:500}
+.aitool .robot{position:absolute;left:40px;top:150px;width:220px;-webkit-mask-image:radial-gradient(circle at 45% 50%,#000 55%,transparent 72%);mask-image:radial-gradient(circle at 45% 50%,#000 55%,transparent 72%)}
+.aitool .tipblob{position:absolute;left:40px;top:410px;width:210px;padding:22px 20px;border-radius:40% 30% 30% 50%/30% 30% 40% 40%;background:linear-gradient(160deg,#e9e3ff,#dde7ff);font-size:16px;line-height:1.45;color:var(--ink)}
+.aitool .tipblob b{display:flex;align-items:center;gap:6px;color:#5a3df0;font-size:18px;margin-bottom:4px}
+.aitool .tipblob:after{content:"";display:block;width:80px;height:3px;border-radius:3px;background:var(--orange);margin-top:10px}
+.chatwin{position:absolute;right:60px;left:290px;top:160px;bottom:40px;background:rgba(255,255,255,.85);border-radius:28px;box-shadow:0 20px 50px rgba(60,70,160,.14);padding:20px;display:flex;flex-direction:column;gap:14px;backdrop-filter:blur(8px)}
+.chatarea{flex:1;border-radius:20px;padding:18px 22px;overflow:auto;display:flex;flex-direction:column;gap:10px}
+.chatarea .does{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:4px}
+.chatarea .does b{font-size:15px;color:var(--navy);margin-left:4px}
+.chatarea .does span{background:rgba(255,255,255,.85);border-radius:999px;padding:5px 14px;font-size:14px;font-weight:600;color:var(--navy)}
+.chatarea .plabel{font-size:15px;font-weight:700;color:var(--navy);margin-top:4px}
+.prompt{background:rgba(255,255,255,.92);border-radius:14px;padding:11px 16px;font-size:15.5px;line-height:1.45;text-align:right;color:var(--ink);transition:.2s;display:flex;gap:10px;align-items:flex-start;border:2px solid transparent}
+.prompt:hover{border-color:rgba(63,107,255,.35);transform:translateX(-3px)}
+.prompt.on{border-color:var(--blue2);background:#fff}
+.prompt i{font-style:normal;flex:none;width:24px;height:24px;border-radius:8px;background:var(--soft);display:grid;place-items:center;font-size:13px;font-weight:800;color:var(--blue)}
+.askbar{height:62px;background:#fff;border-radius:999px;box-shadow:0 6px 18px rgba(60,70,160,.1);display:flex;align-items:center;padding:0 10px;gap:12px}
+.askbar .plus{width:42px;height:42px;border-radius:50%;background:#f1f3f8;display:grid;place-items:center;font-size:22px;color:#666;flex:none}
+.askbar .txt{flex:1;font-size:15px;color:#8a8fa8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl}
+.askbar .txt.filled{color:var(--ink)}
+.askbar .copy{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:var(--soft);color:var(--blue);font-weight:700;font-size:14px;flex:none}
+.askbar .send{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#3f6bff,#7a3cf0);flex:none;display:grid;place-items:center;color:#fff}
+.toolnav{position:absolute;bottom:40px;left:60px;display:flex;gap:10px;z-index:3}
+.recipe{display:flex;gap:10px;margin-top:10px}
+.recipe div{flex:1;border-radius:16px;padding:14px;background:var(--soft);position:relative}
+.recipe div b{display:block;font-size:18px;color:var(--blue);margin-bottom:4px}
+.recipe div span{font-size:14px;color:var(--ink);line-height:1.4}
+.recipe div:not(:last-child):after{content:"←";position:absolute;left:-10px;top:50%;transform:translateY(-50%);color:var(--orange);font-weight:900;z-index:2}
+
+/* ---------- END ---------- */
+#end{background:var(--grad);color:#fff}
+#end .ecard{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:760px;background:#fff;color:var(--ink);border-radius:30px;padding:46px 54px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+#end .ecard h1{font-size:44px;margin:0;color:var(--navy);font-weight:900}
+.elist{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:20px 0 26px}
+.elist span{padding:7px 14px;border-radius:999px;background:var(--soft);font-size:14px;font-weight:600;color:var(--muted)}
+.elist span.ok{background:#e6f7ef;color:#16935f}
+</style>
+</head>
+<body>
+<div id="stage">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="gP" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6f7dff"/><stop offset="1" stop-color="#3a2fd6"/></linearGradient>
+  <linearGradient id="gO" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb35f"/><stop offset="1" stop-color="#f26f17"/></linearGradient>
+  <linearGradient id="gL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e3e8ff"/><stop offset="1" stop-color="#c3cdfb"/></linearGradient>
+</defs></svg>
+
+<!-- ===================================================== WELCOME -->
+<section class="screen active" id="welcome" data-title="ברוכים הבאים">
+  <div class="wcard">
+    <div class="wbar"></div>
+    <div class="step on" data-step="0">
+      <h1>ברוכים הבאים<br><span class="wgrad">למאוחדת!</span></h1>
+      <p>כניסתכם לתפקיד ניהולי חדש בארגון, הינה שלב משמעותי המצריך למידה של עולם תוכן רחב – מערכות, תהליכים, נהלים ושפה ארגונית שמעצבים את העשייה היומיומית ודרושים לקליטה איכותית והצלחה בתפקיד.</p>
+      <button class="wbtn" onclick="welcomeStep(1)"><span>המשך...</span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></i></button>
+    </div>
+    <div class="step s2" data-step="1">
+      <h1>ברוכים הבאים <span class="wgrad">למאוחדת!</span></h1>
+      <p>לפניכם סביבה שנועדה לעשות קצת סדר בתוך המורכבות, ולהנגיש את הנושאים המרכזיים שכל מנהל במאוחדת צריך להכיר כבר בתחילת הדרך.</p>
+      <p>אנו מזמינים אתכם לעיין בתכנים, לבחור מה רלוונטי עבורכם, ולצאת לדרך עם בסיס מקצועי להמשך תהליך הלמידה. זה הזמן להכיר, לשאול ולבחור את מה שיסייע לכם ביותר – ולהתחיל לייצר השפעה כבר מהיום הראשון.</p>
+      <p class="good">בהצלחה!</p>
+      <button class="wbtn" onclick="go('home')"><span>לכניסה לחצו כאן</span><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></i></button>
+      <button class="wback" onclick="welcomeStep(0)">חזרה</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== HOME -->
+<section class="screen" id="home" data-title="מרכז הניהול">
+  <div class="hhead"><img src="assets/logo.png" alt="מאוחדת"><div class="grow"></div></div>
+  <div class="hero"><div class="hb1"></div><div class="hb2"></div></div>
+  <img class="woman" src="assets/hero-woman.png" alt="">
+  <div class="slogan">בריאות<br>טובה יותר<br>לעובדים שלנו</div>
+  <div class="htitle">
+    <h1>מרכז הניהול <span class="hl">במאוחדת</span></h1>
+    <p>כל הכלים המרכזיים שאתם צריכים בתחילת הדרך – מרוכזים במקום אחד.</p>
+  </div>
+  <div class="cards">
+    <div class="row">
+      <div class="tcard" data-topic="ai" onclick="go('ai')"><span class="seen">✓ נצפה</span><div class="ti" data-icon="ai"></div><h3>כלי AI לשיפור<br>העבודה היומיומית</h3><p>כלים פרקטיים לייעול,<br>חדשנות והתייעלות.</p><span class="go">כניסה לנושא <i data-icon="arrow"></i></span></div>
+      <div class="tcard" data-topic="leadership" onclick="go('leadership')"><span class="seen">✓ נצפה</span><div class="ti" data-icon="leadership"></div><h3>מודל הניהול<br>והמנהיגות</h3><p>העקרונות שמובילים<br>אותנו להצלחה.</p><span class="go">כניסה לנושא <i data-icon="arrow"></i></span></div>
+      <div class="tcard" data-topic="strategy" onclick="go('strategy')"><span class="seen">✓ נצפה</span><div class="ti" data-icon="strategy"></div><h3>אסטרטגיית מאוחדת</h3><p>היכרות עם החזון, הערכים<br>והיעדים האסטרטגיים שלנו.</p><span class="go">כניסה לנושא <i data-icon="arrow"></i></span></div>
+      <div class="tcard" data-topic="workplan" onclick="go('workplan')"><span class="seen">✓ נצפה</span><div class="ti" data-icon="workplan"></div><h3>תכנית העבודה במאוחדת</h3><p>היכרות עם תהליך התכנון,<br>היעדים והמשימות האישיות.</p><span class="go">כניסה לנושא <i data-icon="arrow"></i></span></div>
+    </div>
+    <div class="row row2">
+      <div class="tcard" data-topic="procurement" onclick="go('procurement')"><span class="seen">✓ נצפה</span><div class="ti" data-icon="procurement"></div><h3>יסודות הרכש</h3><p>היכרות עם תהליכי הרכש,<br>נהלים וכלים חשובים.</p><span class="go">כניסה לנושא <i data-icon="arrow"></i></span></div>
+      <div class="tcard" data-topic="performance" onclick="go('performance')"><span class="seen">✓ נצפה</span><div class="ti" data-icon="performance"></div><h3>הערכת ביצועים</h3><p>כל מה שצריך לדעת<br>על תהליך ההערכה.</p><span class="go">כניסה לנושא <i data-icon="arrow"></i></span></div>
+      <div class="tcard" data-topic="data" onclick="go('data')"><span class="seen">✓ נצפה</span><div class="ti" data-icon="data"></div><h3>ניהול מבוסס נתונים</h3><p>איך מנתחים, מבינים ומקבלים<br>החלטות חכמות יותר.</p><span class="go">כניסה לנושא <i data-icon="arrow"></i></span></div>
+    </div>
+  </div>
+  <div class="prog"><span id="progTxt">0 מתוך 7 נושאים</span><div class="bar"><i id="progBar"></i></div></div>
+  <button class="btn btn-g exit" onclick="go('end')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h5a1 1 0 011 1v14a1 1 0 01-1 1h-5"/><path d="M10 8l-4 4 4 4M6 12h10"/></svg>סיום ויציאה</button>
+</section>
+
+<!-- ===================================================== LEADERSHIP -->
+<section class="screen topic" id="leadership" data-title="מודל הניהול והמנהיגות">
+  <div class="bgsoft"></div>
+  <div class="phead"><div class="blob b1"></div><div class="blob b2"></div>
+    <h1><span class="ic" data-icon="leadership"></span>מודל הניהול והמנהיגות <span class="hl">של מאוחדת</span></h1>
+  </div>
+  <div class="tabs" data-group="lead">
+    <button class="tab on">על המודל</button><button class="tab">צפייה במודל</button><button class="tab">אבחון עצמי</button><button class="tab">שאלה למחשבה</button>
+  </div>
+  <div class="pcontent" data-group="lead">
+    <div class="panel on">
+      <div class="grid" style="grid-template-columns:1.15fr 1fr;height:100%">
+        <div class="card" style="display:flex;flex-direction:column">
+          <span class="kicker">מה זה המודל?</span>
+          <h2>מנהיגות אפקטיבית, מובילה ומחוברת</h2>
+          <p class="lead">המודל נבנה על ידי הארגון והוא מגדיר את <b>הציפייה הארגונית ממנהל במאוחדת</b>.</p>
+          <p class="lead">המודל מבוסס על <b class="hl">4 מרכיבים משלימים</b>, שיחד יוצרים מנהיגות אפקטיבית, מובילה ומחוברת. כלומר, הניהול במאוחדת נשען על שילוב בין כל המרכיבים – לא על אחד בלבד. כך נבנית מנהיגות משותפת ומצליחה בארגון!</p>
+          <div style="margin-top:auto"><button class="btn btn-o" onclick="tab('lead',1)">לחצו לצפייה במודל המנהיגות <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+        </div>
+        <div class="grid" style="grid-template-rows:1fr 1fr">
+          <div class="card"><h3 class="ih"><span class="ico " data-icon="target"></span>למה נועד המודל?</h3><p>ליצור שפה ניהולית אחידה ולהוות בסיס משותף לאופן שבו אנו מובילים אנשים, תהליכים ותוצאות בארגון.</p></div>
+          <div class="card"><h3 class="ih"><span class="ico " data-icon="network"></span>איפה פוגשים אותו?</h3><p style="margin-bottom:8px">המודל מהווה תשתית תומכת למגוון תהליכים בארגון:</p>
+            <span class="chip">גיוס ומיון</span><span class="chip">תכניות פיתוח מנהלים</span><span class="chip">הערכה ועתודה</span><span class="chip">כלי לאבחון עצמי</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="wheelwrap">
+        <svg class="wheel" id="wheel" viewBox="0 0 440 440"></svg>
+        <div class="qpanel">
+          <span class="hint" id="qhint">לחצו על כל אחד מ-4 המרכיבים במודל</span>
+          <h2 id="qtitle" style="font-size:30px;margin-top:8px">מודל ניהול ומנהיגות</h2>
+          <span class="uline"></span>
+          <div id="qcomps"><p class="lead muted">כל מרכיב במודל כולל 3 מיומנויות ניהוליות. יחד הם יוצרים מנהיגות משותפת ומצליחה.</p></div>
+          <div class="qprog" id="qprog"><span></span><span></span><span></span><span></span><b id="qcount">0/4 מרכיבים נצפו</b></div>
+          <button class="btn btn-o qnext" id="qnext" onclick="tab('lead',2)">המשך לאבחון עצמי <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 6l-6 6 6 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="diag">
+        <div class="diag-text">
+          <span class="kicker">אבחון עצמי</span>
+          <h2>ניתן להשתמש במודל גם ככלי לאבחון עצמי</h2>
+          <span class="uline"></span>
+          <p class="lead">לעצור לרגע, לבחון היכן אנו נמצאים ביחס לממדים השונים של המודל, ולזהות נקודות לחיזוק ולהתפתחות.</p>
+          <p class="lead">לצורך כך עומד לרשותכם <b>שאלון אישי</b>, המסייע לתרגם את עקרונות המודל להתבוננות מעשית על סגנון הניהול האישי שלכם – ולהגדיר צעדים להתקדמות.</p>
+          <button class="btn btn-o" data-link="questionnaire" onclick="openLink(this)">לחצו למילוי השאלון האישי <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg></button>
+        </div>
+        <div class="diag-art">
+          <div class="diag-blob"></div>
+          <img class="diag-woman" src="assets/woman-bust.png" alt="">
+          <div class="ipad">
+            <div class="ipad-screen">
+              <div class="ipad-top"><span class="ico sm" data-icon="form"></span><b>השאלון האישי שלי</b></div>
+              <div class="ipad-row"><span>התווית כיוון ודרך</span><i style="--v:78%"></i></div>
+              <div class="ipad-row"><span>הובלה לביצועים</span><i style="--v:64%"></i></div>
+              <div class="ipad-row"><span>הובלת אנשים</span><i style="--v:86%"></i></div>
+              <div class="ipad-row"><span>פתיחות ואומץ ניהולי</span><i style="--v:52%"></i></div>
+              <div class="ipad-cta">הצעדים הבאים שלי ←</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="grid" style="grid-template-columns:1fr 1fr;height:100%">
+        <div class="card" style="background:var(--grad);color:#fff;padding:26px 34px;overflow:hidden">
+          <div style="position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.08);left:-80px;bottom:-90px"></div>
+          <span class="kicker" style="color:#ffc58f">שאלה למחשבה</span>
+          <h2 class="ih" style="color:#fff;font-size:30px;margin-bottom:0"><span class="ico lg bare" data-icon="think" data-white="1"></span>איפה אתם ביחס למודל?</h2>
+          <span class="uline"></span>
+          <p style="font-size:22px;font-weight:600;margin-bottom:10px" class="ih"><span class="ico bare" data-icon="medal" data-white="1"></span>מה חזק אצלכם?</p>
+          <p style="font-size:22px;font-weight:600;margin:0" class="ih"><span class="ico bare" data-icon="growth" data-white="1"></span>מה דורש חיזוק?</p>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column">
+          <h3>רשמו לעצמכם</h3>
+          <p class="muted">המחשבות שלכם נשמרות רק עבורכם.</p>
+          <textarea id="reflect" placeholder="הקלידו כאן..." style="flex:1;border:2px solid var(--line);border-radius:16px;padding:16px;font-family:inherit;font-size:16px;resize:none;outline:none;background:#fafbff"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== STRATEGY -->
+<section class="screen topic" id="strategy" data-title="אסטרטגיית מאוחדת">
+  <div class="bgsoft"></div>
+  <div class="phead"><div class="blob b1"></div><div class="blob b2"></div>
+    <h1><span class="ic" data-icon="strategy"></span>אסטרטגיית <span class="hl">מאוחדת</span></h1>
+  </div>
+  <div class="tabs" data-group="strat">
+    <button class="tab on">למה חשוב להכיר?</button><button class="tab">9 הכיוונים האסטרטגיים</button><button class="tab">איפה זה פוגש אותנו?</button><button class="tab">מאסטרטגיה לעשייה</button>
+  </div>
+  <div class="pcontent" data-group="strat">
+    <div class="panel on">
+      <div class="grid" style="grid-template-columns:330px 1fr;height:100%">
+        <div class="card" style="background:var(--grad);color:#fff;text-align:center;display:flex;flex-direction:column;justify-content:center;overflow:hidden">
+          <div style="position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.08);right:-70px;top:-70px"></div>
+          <p style="font-size:18px;margin:0">תכנית אסטרטגית רב־שנתית</p>
+          <div style="font-size:96px;font-weight:900;line-height:1">5</div>
+          <p style="font-size:22px;font-weight:700;margin:0">שנים</p>
+          <div style="margin:16px auto 0;background:#fff;color:var(--navy);border-radius:999px;padding:8px 22px;font-weight:800;font-size:22px">2023 – 2028</div>
+          <p style="font-size:15px;margin:16px 0 0;opacity:.9">בכל שנה מושם דגש על מיקודים מרכזיים מתוך התכנית</p>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;padding:28px 34px">
+          <span class="kicker">למה חשוב שתכירו את האסטרטגיה הארגונית?</span>
+          <h2>מצפן משותף לכלל העשייה</h2>
+          <span class="uline"></span>
+          <p class="lead">האסטרטגיה הארגונית במאוחדת מגדירה את הכיוון, סדרי העדיפויות והמטרות של הארגון לטווח הרחוק.</p>
+          <p class="lead">עבור מנהלים, היכרות עם האסטרטגיה היא <b>כלי עבודה חיוני</b> שמאפשר להבין את ההקשר הרחב של הפעילות, לקבל החלטות מושכלות ולכוון את הצוות לעבר המטרות הארגוניות ולמשמעות רחבה יותר.</p>
+          <div style="margin-top:auto;display:flex;gap:12px">
+            <button class="btn btn-o" onclick="tab('strat',1)">הכירו את 9 הכיוונים <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 6l-6 6 6 6"/></svg></button>
+            <button class="btn btn-g" data-link="strategy-deck" onclick="openLink(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>להורדת מצגת האסטרטגיה</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="dirhead"><span class="hint">לחצו על המספרים להתקדמות</span><div class="dirnav" id="dirnav"></div></div>
+      <div class="card" style="padding:22px 30px" id="dircard"></div>
+    </div>
+    <div class="panel">
+      <div class="grid" style="grid-template-columns:330px 1fr;height:100%">
+        <div class="card" style="background:linear-gradient(135deg,#ffa24a,#f7801e);color:#fff;display:flex;flex-direction:column;justify-content:center">
+          <h2 style="color:#fff;font-size:30px">יישום האסטרטגיה<br>מתחיל בנו!</h2>
+          <p style="font-size:17px">לכל אחד מאיתנו בתחומו, מנהלים ועובדים, יש יכולת לתרום ולהשפיע על הצלחת הקופה.</p>
+          <p style="font-size:17px;font-weight:700">מאיפה מתחילים? היעזרו בנקודות למחשבה ←</p>
+          <button class="btn btn-g" style="margin-top:auto;align-self:flex-start;color:var(--orange)" onclick="tab('strat',3)">המשך: מאסטרטגיה לעשייה <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 6l-6 6 6 6"/></svg></button>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 1fr">
+          <div class="card"><div class="num">1</div><p class="lead" style="margin-top:12px">איך אקדם את הבנת הכיוונים האסטרטגיים והטמעתם בקרב הצוות שלי?</p></div>
+          <div class="card"><div class="num">2</div><p class="lead" style="margin-top:12px">איך אוכל לתרום במסגרת תפקידי להשגת היעדים האסטרטגיים?</p></div>
+          <div class="card"><div class="num">3</div><p class="lead" style="margin-top:12px">איך אתן דוגמה אישית בהתנהלות יומיומית – ממוקדת אסטרטגיה?</p></div>
+          <div class="card"><div class="num">4</div><p class="lead" style="margin-top:12px">איך אוכל להעביר הלאה את המסר, שהשינוי מתחיל בנו ושיש לנו יכולת השפעה עליו?</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="grid" style="grid-template-columns:1fr 1fr;height:100%;grid-template-rows:auto 1fr">
+        <div class="card" style="grid-column:1/3;display:flex;gap:24px;align-items:center;padding:16px 22px">
+          <img src="assets/junior.png" alt="מאוחדת ג'וניור" style="height:78px;border-radius:12px">
+          <div><span class="kicker">דוגמה לאיך אסטרטגיה מתורגמת לעשייה – מימוש מיקוד מספר 1</span>
+          <h2 style="margin:0">הקופה האטרקטיבית ביותר לילדים!</h2></div>
+        </div>
+        <div class="card jr-intro"><p class="lead" style="font-size:16.5px;margin-bottom:6px">שימת דגש על כלל השירותים הניתנים לילדים מגיל 0–18, ובתוכם מגוון רחב של שירותים ומומחים רפואיים, תחת מעטפת אחת שנקראת: <b class="hl">מאוחדת ג'וניור</b>.</p>
+          <div class="kids-scene"><img src="assets/family.jpg" alt="הורה וילדים"></div>
+          <span class="hint">לחצו על כל נושא להרחבה</span>
+        </div>
+        <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">
+          <div class="card clickcard jr" onclick="openModal('m-jr-center',this)" style="padding:16px"><h3 class="ih"><span class="ico " data-icon="headset"></span>מוקד ג'וניור</h3><p class="muted" style="font-size:14px;margin:0">רופא ילדים אונליין 24/7</p></div>
+          <div class="card clickcard jr" onclick="openModal('m-jr-sites',this)" style="padding:16px"><h3 class="ih"><span class="ico " data-icon="mappin"></span>מרכזי ג'וניור</h3><p class="muted" style="font-size:14px;margin:0">2 מרכזים גדולים + 21 מיני ג'וניור</p></div>
+          <div class="card clickcard jr" onclick="openModal('m-jr-hand',this)" style="padding:16px"><h3 class="ih"><span class="ico " data-icon="phoneheart"></span>בריאות בכף ידך</h3><p class="muted" style="font-size:14px;margin:0">ליווי רפואי יוזם להורים וילדים</p></div>
+          <div class="card clickcard jr" onclick="openModal('m-jr-tyto',this)" style="padding:16px"><h3 class="ih"><span class="ico " data-icon="stethoscope"></span>Tyto</h3><p class="muted" style="font-size:14px;margin:0">בדיקת רופא מרחוק</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== WORKPLAN -->
+<section class="screen topic" id="workplan" data-title="תכנית העבודה במאוחדת">
+  <div class="bgsoft"></div>
+  <div class="phead"><div class="blob b1"></div><div class="blob b2"></div>
+    <h1><span class="ic" data-icon="workplan"></span>תכנית העבודה <span class="hl">במאוחדת</span></h1>
+    <p>תכניות העבודה במאוחדת נגזרות מתוך האסטרטגיה הארגונית והן כוללות יעדים מדידים ואיכותיים.</p>
+  </div>
+  <div class="tabs" data-group="wp">
+    <button class="tab on">ניהול מבוסס יעדים</button><button class="tab">כיצד בנויה תכנית העבודה?</button><button class="tab">עקרונות חשובים למנהלים חדשים</button><button class="tab">כלים שיעזרו לכם</button>
+  </div>
+  <div class="pcontent" data-group="wp">
+    <div class="panel on">
+      <div class="grid" style="grid-template-columns:1fr 330px;height:100%">
+        <div class="card" style="padding:22px 28px;display:flex;flex-direction:column">
+          <h2 style="margin-bottom:0">ניהול מבוסס יעדים</h2>
+          <span class="uline"></span>
+          <p class="lead" style="margin:-4px 0 12px;font-size:16.5px">לכל מנהל תכנית עבודה שנתית, אשר מלווה בבקרה ונבחנת פעמיים בשנה.</p>
+          <div class="mbo">
+            <div><span class="ico lg" data-icon="compass"></span><b>תכנית עבודה נגזרת מהאסטרטגיה</b></div>
+            <div><span class="ico lg" data-icon="target"></span><b>כוללת יעדים מדידים</b></div>
+            <div><span class="ico lg" data-icon="calendar"></span><b>נבחנת פעמיים בשנה<small>(חציון וסוף שנה)</small></b></div>
+            <div><span class="ico lg" data-icon="gauge"></span><b>מלווה במדדים ובבקרה</b></div>
+          </div>
+          <div class="mbo-go">
+            <span class="hint">לחצו להרחבה</span>
+            <div>
+              <button onclick="tab('wp',1)"><span class="ico" data-icon="steps"></span>כיצד בנויה תכנית העבודה?</button>
+              <button onclick="tab('wp',2)"><span class="ico" data-icon="bulb"></span>עקרונות חשובים למנהלים חדשים</button>
+              <button onclick="tab('wp',3)"><span class="ico" data-icon="toolbox"></span>כלים שיעזרו לכם</button>
+            </div>
+          </div>
+        </div>
+        <div class="tip" style="display:flex;flex-direction:column;justify-content:center">
+          <div class="t"><span class="ico bare" data-icon="bulb"></span>טיפ! לפני בניית תכנית העבודה</div>
+          <p class="lead" style="margin:0">חשוב להתעדכן בתכניות היחידתיות, המחוזיות והחטיבתיות – ולהבין את התמונה הרחבה שבתוכה אתם פועלים.</p>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="card" style="height:100%;padding:20px 30px;display:flex;flex-direction:column">
+        <div class="parts">
+          <h2 style="margin:0;flex:1">כיצד בנויה תכנית העבודה?</h2>
+          <button class="on" onclick="wpPart(0,this)">חלק 1: המבנה העקרוני</button>
+          <button onclick="wpPart(1,this)">חלק 2: מעגל העבודה השנתי</button>
+        </div>
+        <span class="uline"></span>
+        <div class="wppart on">
+          <p class="lead" style="margin:0 0 14px">המבנה העקרוני של תכנית עבודה כולל:</p>
+          <div class="struct">
+            <div><span class="ico xl" data-icon="target"></span><b>יעד</b></div>
+            <div><span class="ico xl" data-icon="gauge"></span><b>מדד</b></div>
+            <div><span class="ico xl" data-icon="steps"></span><b>מהלכים מרכזיים</b></div>
+            <div><span class="ico xl" data-icon="flag"></span><b>אבני דרך</b></div>
+            <div><span class="ico xl" data-icon="search"></span><b>בקרה</b></div>
+          </div>
+        </div>
+        <div class="wppart">
+          <div class="cycle">
+            <svg viewBox="0 0 440 300" class="cycle-ring"><defs><marker id="carr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#f7801e"/></marker></defs>
+              <ellipse cx="220" cy="150" rx="185" ry="118" fill="none" stroke="#dfe4f7" stroke-width="14"/>
+              <ellipse cx="220" cy="150" rx="185" ry="118" fill="none" stroke="#f7801e" stroke-width="3" stroke-dasharray="6 10"/>
+              <text x="220" y="143" text-anchor="middle" font-family="Heebo" font-weight="900" font-size="22" fill="#16196b">מעגל העבודה</text>
+              <text x="220" y="170" text-anchor="middle" font-family="Heebo" font-weight="900" font-size="22" fill="#f7801e">השנתי</text>
+            </svg>
+            <div class="cnode" style="right:50%;top:-6px;transform:translateX(50%)"><span class="ico lg" data-icon="bulb"></span><b>אוגוסט</b><small>תחילת חשיבה</small></div>
+            <div class="cnode" style="right:0;top:80px"><span class="ico lg" data-icon="send"></span><b>אוקטובר–נובמבר</b><small>סיכום שנה, קבלת הנחיות והגשת תכניות</small></div>
+            <div class="cnode" style="right:90px;bottom:0"><span class="ico lg" data-icon="check"></span><b>תחילת שנה</b><small>אישור והטמעה</small></div>
+            <div class="cnode" style="left:90px;bottom:0"><span class="ico lg" data-icon="gauge"></span><b>חציון</b><small>דיון בקרה</small></div>
+            <div class="cnode" style="left:0;top:80px"><span class="ico lg" data-icon="flag"></span><b>סוף שנה</b><small>סיכום ביצוע</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="grid" style="grid-template-columns:1fr 1fr;height:100%">
+        <div class="card principle"><div class="num">1</div><div><h3>חברו את תכנית העבודה לאסטרטגיה</h3><p class="muted">ודאו שכל יעד או מהלך שאתם מקדמים נגזר מכיוון אסטרטגי ברור.</p></div></div>
+        <div class="card principle"><div class="num">2</div><div><h3>הגדירו יעדים מדידים</h3><p class="muted">נסחו יעדים עם מדד, מספר וטווח זמן – לא רק כוונה כללית.</p></div></div>
+        <div class="card principle"><div class="num">3</div><div><h3>פרקו יעדים למהלכים ואבני דרך</h3><p class="muted">תרגמו כל יעד לפעולות אופרטיביות שניתן לעקוב אחריהן.</p></div></div>
+        <div class="card principle"><div class="num">4</div><div><h3>נהלו בקרה שוטפת לאורך השנה</h3><p class="muted">בחנו התקדמות בחציון ובסוף שנה, והתאימו את התכנית במידת הצורך.</p></div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <p class="lead" style="margin:0 0 14px">לעזרתכם, מספר כלים ומודלים שיסייעו לכם בבניית תכנית העבודה. <span class="hint">לחצו על כל כלי להרחבה</span></p>
+      <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="card clickcard" onclick="openModal('m-swot',this)" style="text-align:center;padding:26px"><div style="font-size:40px;font-weight:900" class="aigrad">SWOT</div><h3>ניתוח SWOT</h3><p class="muted">כלי אבחון לבניית תכנית עבודה</p><span class="go">להרחבה <i data-icon="arrow"></i></span></div>
+        <div class="card clickcard" onclick="openModal('m-smart',this)" style="text-align:center;padding:26px"><div style="font-size:40px;font-weight:900" class="aigrad">SMART</div><h3>מודל SMART</h3><p class="muted">כלי להגדרת יעדים</p><span class="go">להרחבה <i data-icon="arrow"></i></span></div>
+        <div class="card clickcard" onclick="openModal('m-impact',this)" style="text-align:center;padding:26px"><div style="font-size:40px;font-weight:900;direction:ltr" class="aigrad">I × E</div><h3>תיעדוף מהלכים</h3><p class="muted">כלי לבחינת תיעדוף</p><span class="go">להרחבה <i data-icon="arrow"></i></span></div>
+      </div>
+      <div style="margin-top:22px;text-align:center"><button class="btn btn-o" data-link="workplan-helper" onclick="openLink(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>לחצו להורדת קובץ עזר לבניית תכניות עבודה</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== PROCUREMENT -->
+<section class="screen topic" id="procurement" data-title="יסודות הרכש">
+  <div class="bgsoft"></div>
+  <div class="phead"><div class="blob b1"></div><div class="blob b2"></div>
+    <h1><span class="ic" data-icon="procurement"></span>יסודות <span class="hl">הרכש</span></h1>
+    <p>מתי נכנסים לעולם הרכש? ומה באחריותנו כמנהלים?</p>
+  </div>
+  <div class="tabs" data-group="proc">
+    <button class="tab on">מתי זה רכש?</button><button class="tab">תהליך ב-6 צעדים</button><button class="tab">מי מטפל?</button><button class="tab">סוגי ההליכים</button><button class="tab">5 כללי זהב</button><button class="tab">טעויות נפוצות</button>
+  </div>
+  <div class="pcontent" data-group="proc">
+    <div class="panel on">
+      <div class="grid" style="grid-template-columns:1fr 1fr;height:100%">
+        <div class="card" style="display:flex;flex-direction:column">
+          <div style="background:var(--grad);color:#fff;border-radius:16px;padding:18px 22px;font-size:21px;font-weight:700;line-height:1.4;margin-bottom:16px">כל התקשרות כספית שאנו יוזמים או מאשרים <span style="color:#ffc58f">= תהליך רכש</span></div>
+          <h3>זה כולל:</h3>
+          <div><span class="chip">ספק שירות חדש למחלקה</span><span class="chip">יועץ חיצוני</span><span class="chip">רכישת ציוד</span><span class="chip">הארכת חוזה קיים</span><span class="chip">עבודה חד־פעמית</span><span class="chip">התקשרות מקומית במחוז</span><span class="chip">ועוד...</span></div>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column">
+          <span class="kicker">נוהל רכש והתקשרויות</span>
+          <p>במאוחדת עובדים לפי נוהל רכש והתקשרויות. הנוהל מסדיר את כל דרכי ההתקשרות, הרכש והעבודה עם ספקים ונותני שירות בקופה, בהתאם לדין ולתקנות חובת המכרזים.</p>
+          <p><b>כמנהלים חדשים – זהו אחד הנהלים החשובים ביותר שתידרשו להכיר</b>, משום שהוא מגדיר מה מותר, מי מוסמך, כיצד מבצעים רכש, ומהם הסיכונים הארגוניים / המשפטיים שיש להימנע מהם.</p>
+          <div style="margin-top:auto"><button class="btn btn-o" data-link="procurement-procedure" onclick="openLink(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>לצפייה בנוהל רכש והתקשרויות המלא</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <p class="lead" style="margin-bottom:14px"><b>תהליך רכש תקין – ב-6 צעדים</b> <span class="hint">לחצו על "הצעד הבא" כדי להתקדם</span></p>
+      <div class="steps6" id="steps6">
+        <div class="step6"><div class="num">1</div>זיהוי צורך ואישורו ("הכרה בצורך")</div>
+        <div class="step6"><div class="num">2</div>בדיקת מסגרת תקציבית</div>
+        <div class="step6"><div class="num">3</div>פנייה לאגף הרכש הרלוונטי</div>
+        <div class="step6"><div class="num o">4</div>בחירת סוג הליך (מכרז / פטור וכו')</div>
+        <div class="step6"><div class="num o">5</div>אישור ועדה מוסמכת במידת הצורך</div>
+        <div class="step6"><div class="num o">6</div>חתימה והזמנת עבודה במערכת – לפני תחילת השירות</div>
+      </div>
+      <div style="text-align:center;margin-top:20px"><button class="btn btn-b" id="stepBtn" onclick="nextStep6()">הצעד הבא</button></div>
+    </div>
+    <div class="panel">
+      <div class="grid" style="grid-template-columns:1fr 1fr;height:100%">
+        <div class="card" style="padding:28px">
+          <span class="kicker">מי עושה מה?</span>
+          <h2 class="ih"><span class="ico lg" data-icon="gavel"></span>ועדת המכרזים</h2>
+          <p class="lead">הגוף המרכזי שמאשר מכרזים, פטורים, בחירת ספקים והחלטות מהותיות.</p>
+          <div class="goal">ועדת רכש מחוזית/חטיבתית מאשרת פטורי מכרז בטווחי סכומים מוגדרים.</div>
+        </div>
+        <div class="card" style="padding:28px">
+          <span class="kicker">מי עושה מה?</span>
+          <h2 class="ih"><span class="ico lg" data-icon="cart"></span>אגפי רכש</h2>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;background:var(--soft);border-radius:14px;padding:14px 18px"><b style="color:var(--navy)">רכש כללי</b><span>אגף הרכש</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:var(--soft);border-radius:14px;padding:14px 18px"><b style="color:var(--navy)">שירותים רפואיים</b><span>אגף רכש ובקרת שירותים רפואיים</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:var(--soft);border-radius:14px;padding:14px 18px"><b style="color:var(--navy)">מקרקעין</b><span>יחידת נכסים</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <p class="lead" style="margin-bottom:14px"><b>סוגי ההתקשרויות המרכזיים</b></p>
+      <div class="grid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="card" style="text-align:center;border-top:5px solid var(--orange)"><span class="ico xl" data-icon="building"></span><h3>מכרז פומבי</h3><p class="muted">ברירת המחדל</p></div>
+        <div class="card" style="text-align:center"><span class="ico xl" data-icon="lock"></span><h3>מכרז סגור</h3><p class="muted">לספקים מסוימים בלבד</p></div>
+        <div class="card" style="text-align:center"><span class="ico xl" data-icon="laptopbolt"></span><h3>מכרז ממוכן / מהיר</h3><p class="muted">הליך אלקטרוני</p></div>
+        <div class="card" style="text-align:center"><span class="ico xl" data-icon="docsclock"></span><h3>מכרז מסגרת</h3><p class="muted">התקשרות ארוכת טווח עם מספר ספקים</p></div>
+        <div class="card" style="text-align:center"><span class="ico xl" data-icon="doccheck"></span><h3>פטור ממכרז</h3><p class="muted">רק באישור ועדה מוסמכת ובתיעוד מלא</p></div>
+      </div>
+    </div>
+    <div class="panel">
+      <p class="lead" style="margin-bottom:14px"><b>עקרונות יסוד – 5 כללי זהב למנהל</b></p>
+      <div class="grid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="card" style="text-align:center"><div class="num o" style="margin:0 auto 12px;width:52px;height:52px;font-size:24px">1</div><p class="lead">ברירת המחדל היא מכרז פומבי</p></div>
+        <div class="card" style="text-align:center"><div class="num o" style="margin:0 auto 12px;width:52px;height:52px;font-size:24px">2</div><p class="lead">[כלל זהב 2 – להשלמה]</p></div>
+        <div class="card" style="text-align:center"><div class="num o" style="margin:0 auto 12px;width:52px;height:52px;font-size:24px">3</div><p class="lead">[כלל זהב 3 – להשלמה]</p></div>
+        <div class="card" style="text-align:center"><div class="num o" style="margin:0 auto 12px;width:52px;height:52px;font-size:24px">4</div><p class="lead">[כלל זהב 4 – להשלמה]</p></div>
+        <div class="card" style="text-align:center"><div class="num o" style="margin:0 auto 12px;width:52px;height:52px;font-size:24px">5</div><p class="lead">[כלל זהב 5 – להשלמה]</p></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="grid" style="grid-template-columns:1fr 330px;height:100%">
+        <div>
+          <p class="lead" style="margin-bottom:12px"><b>טעויות שמנהלים חדשים עושים – ואסור שיקרו</b> <span class="hint">לחצו על כל טעות כדי "למחוק" אותה</span></p>
+          <div class="mistake" onclick="this.classList.add('x')"><span class="ban" data-icon="ban"></span>מתחילים לעבוד עם ספק לפני חתימה</div>
+          <div class="mistake" onclick="this.classList.add('x')"><span class="ban" data-icon="ban"></span>מסכמים בעל פה "ונסדיר אחר כך"</div>
+          <div class="mistake" onclick="this.classList.add('x')"><span class="ban" data-icon="ban"></span>מאריכים חוזה בלי לבדוק תוקף ואישור</div>
+          <div class="mistake" onclick="this.classList.add('x')"><span class="ban" data-icon="ban"></span>מפצלים הזמנה כדי לא לעבור סף</div>
+          <div class="mistake" onclick="this.classList.add('x')"><span class="ban" data-icon="ban"></span>לא בודקים אם קיים מכרז רוחבי</div>
+        </div>
+        <div class="tip" style="display:flex;flex-direction:column;justify-content:center;background:linear-gradient(135deg,#fff0f0,#ffe3e3);border-color:#ffc9c9">
+          <div class="t" style="color:#c53030"><span class="ico bare" data-icon="warning"></span>חשוב לזכור</div>
+          <p class="lead" style="margin:0">כל חריגה קטנה עלולה להפוך לסיכון משפטי / רגולטורי.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== PERFORMANCE -->
+<section class="screen topic" id="performance" data-title="הערכת ביצועים">
+  <div class="bgsoft"></div>
+  <div class="phead"><div class="blob b1"></div><div class="blob b2"></div>
+    <h1><span class="ic" data-icon="performance"></span>הערכת <span class="hl">ביצועים</span></h1>
+    <p>תהליך שנתי ומובנה – הזדמנות לשיחה אישית, להעמקת ההיכרות ולהצבת יעדים לשנה הקרובה.</p>
+  </div>
+  <div class="tabs" data-group="perf">
+    <button class="tab on">מהי הערכת ביצועים?</button><button class="tab">שלבי התהליך</button><button class="tab">מה זה אומר עבורכם?</button>
+  </div>
+  <div class="pcontent" data-group="perf">
+    <div class="panel on">
+      <div class="grid" style="grid-template-columns:1.1fr 1fr;height:100%">
+        <div class="card" style="padding:26px 30px">
+          <span class="kicker">מהי הערכת ביצועים במאוחדת?</span>
+          <p class="lead">תהליך הערכה שנתי ומובנה, המהווה הזדמנות לשיחה אישית עם המנהל הישיר, להעמקת ההיכרות, לשיח על התפתחות, לחגיגת הצלחות וללמידה מהאתגרים שחווינו בשנה החולפת – בדרך להצבת יעדים לשנה הקרובה.</p>
+          <div style="display:flex;align-items:center;gap:14px;background:var(--soft);border-radius:16px;padding:14px 18px;margin-top:14px">
+            <span class="ico lg" data-icon="calendar"></span><div><b style="color:var(--navy);font-size:17px">מתי מתקיים?</b><br>אחת לשנה, בדרך כלל בין דצמבר לפברואר.</div>
+          </div>
+        </div>
+        <div class="card" style="padding:26px 30px">
+          <h3>מטרות התהליך</h3>
+          <span class="uline"></span>
+          <ul class="dots">
+            <li>שיפור ביצועים וקידום מטרות הארגון</li>
+            <li>קיום שיחה איכותית בין העובד המוערך למנהל הישיר</li>
+            <li>כלי תומך בקבלת החלטות ניהוליות (קידום והתפתחות, תהליכי שימוע וכו')</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <p class="lead" style="margin-bottom:14px"><b>תהליך הערכת הביצועים במאוחדת בנוי מ-3 שלבים</b> <span class="hint">לחצו על כל שלב</span></p>
+      <div class="stages">
+        <div class="stg on" onclick="stage(this)"><span class="lbl">שלב 1</span><h3 class="ih"><span class="ico lg" data-icon="form"></span>מילוי הערכות</h3><div class="body">שלב מקדים לביצוע שיחת המשוב, הכולל הערכה עצמית של העובדים והערכת מנהלים מקצועיים ומנהלים ישירים.<br><br><b style="color:var(--navy)">למה מתייחסים?</b><br>הישגים, אתגרים, ציפיות לעתיד ורצון להתפתח, עמידה ביעדים וכו'.</div></div>
+        <div class="stg" onclick="stage(this)"><span class="lbl">שלב 2</span><h3 class="ih"><span class="ico lg" data-icon="chat"></span>שיחת משוב</h3><div class="body">שיחה אישית על השנה החולפת והבאה – הזדמנות להתפתח ולהשתפר יחד.</div></div>
+        <div class="stg" onclick="stage(this)"><span class="lbl">שלב 3</span><h3 class="ih"><span class="ico lg" data-icon="doccheck"></span>סיכום הערכה</h3><div class="body">לאחר ביצוע שיחת המשוב תתבצע התייחסות של המנהל העקיף ואישור של העובד.</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="grid" style="grid-template-columns:360px 1fr;height:100%">
+        <div class="card" style="background:linear-gradient(135deg,#ffa24a,#f7801e);color:#fff;display:flex;flex-direction:column;justify-content:center;text-align:center">
+          <p style="font-size:18px;margin:0">מה אתם צריכים לעשות עם זה?</p>
+          <div style="font-size:52px;font-weight:900">כרגע – כלום!</div>
+          <div class="smileic" data-icon="smile"></div>
+        </div>
+        <div class="card" style="padding:26px 30px;display:flex;flex-direction:column">
+          <h3>מה זה אומר מבחינתכם כמנהלים?</h3>
+          <span class="uline"></span>
+          <p class="lead">בשלב הזה חשוב בעיקר להכיר את התהליך ולהבין שהוא חלק ממחזור העבודה השנתי. אין צורך להיערך אליו כבר עכשיו או לבצע פעולות מיוחדות.</p>
+          <p class="lead">כשהמועד יתקרב והתהליך יהיה רלוונטי עבורכם, נדאג לשתף את כל המידע הנדרש, נסביר מה מצופה מכם בכל שלב ונזמין אתכם להדרכות שייתנו לכם את כל הכלים והידע הדרושים.</p>
+          <div class="goal" style="margin-top:auto"><span class="ico sm bare" data-icon="search"></span>להרחבה על התהליך, צפייה בלומדה וקבלת כלים – חפשו "הערכת ביצועים" בקליקה.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== DATA -->
+<section class="screen topic" id="data" data-title="ניהול מבוסס נתונים">
+  <div class="bgsoft"></div>
+  <div class="phead"><div class="blob b1"></div><div class="blob b2"></div>
+    <h1><span class="ic" data-icon="data"></span>ניהול מבוסס <span class="hl">נתונים</span></h1>
+    <p>החלטות מדויקות, זיהוי מגמות ושיפור ביצועים לאורך זמן.</p>
+  </div>
+  <div class="tabs" data-group="data">
+    <button class="tab on">למה זה חשוב?</button><button class="tab">מערכת רימון</button><button class="tab">איך עושים את זה נכון?</button>
+  </div>
+  <div class="pcontent" data-group="data">
+    <div class="panel on">
+      <div class="grid" style="grid-template-columns:1.2fr 1fr;height:100%">
+        <div class="card" style="padding:28px 34px">
+          <span class="kicker">למה זה חשוב?</span>
+          <h2>כלי מרכזי בידי המנהל</h2>
+          <span class="uline"></span>
+          <p class="lead">ניהול מבוסס נתונים הוא אחד הכלים המרכזיים העומדים לרשות מנהל בבואו לקבל החלטות מדויקות, לזהות מגמות ולשפר ביצועים לאורך זמן.</p>
+          <p class="lead">חשוב לבחון אילו נתונים ודוחות נדרשים לנו כדי לנהל בצורה טובה יותר ולקדם מהלכים.</p>
+        </div>
+        <div class="tip" style="display:flex;flex-direction:column;justify-content:center">
+          <div class="t"><span class="ico bare" data-icon="pin"></span>חשוב לציין!</div>
+          <p class="lead" style="margin:0">היקף השימוש בנתונים משתנה מתפקיד לתפקיד. במאוחדת עומדים לרשותכם המנהלים נתונים ממגוון רחב של מערכות ומקורות שכדאי להכיר.</p>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div style="display:flex;gap:24px;height:100%">
+        <div style="flex:1;display:flex;flex-direction:column;gap:14px">
+          <p style="margin:0">מערכת <b>רימון</b> מרכזת את המדדים העסקיים ליחידות השטח ומאפשרת לראות תמונת מצב עדכנית ואחידה של פעילות היחידה (למשל מרפאה) ביחס ליעדים הארגוניים. באמצעות מחוונים כגון סרגל השירות ניתן לזהות מוקדי חוזק לצד הזדמנויות לשיפור.</p>
+          <div class="rimon">
+            <img src="assets/rimon.png" alt="סרגלי מערכת רימון">
+            <div class="hot" style="right:0" onclick="rimon(0,this)"></div>
+            <div class="hot" style="right:25%" onclick="rimon(1,this)"></div>
+            <div class="hot" style="right:50%" onclick="rimon(2,this)"></div>
+            <div class="hot" style="right:75%" onclick="rimon(3,this)"></div>
+          </div>
+          <span class="hint">לחצו על המדדים המרכזיים במערכת, כדי לקבל טעימה קצרה מעולם המדידה</span>
+        </div>
+        <div class="card" style="width:340px;flex:none" id="rimonInfo">
+          <span class="kicker">מערכת רימון</span>
+          <h3>בחרו סרגל</h3>
+          <p class="muted">גם אם הדבר פחות רלוונטי לתפקידכם, חשוב להכיר את מדדי הליבה הארגוניים – לטובת הובלה משותפת של יעדי הארגון.</p>
+          <p class="muted" style="font-size:14px">* המדדים בסרגלים עשויים להשתנות מעת לעת בהתאם למיקוד הניהולי בהנהלה.</p>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="dirnav" id="pnav"></div>
+      <div style="display:flex;align-items:center;gap:16px;height:380px">
+        <button class="arrowbtn" id="pNext" onclick="pr(+1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></button>
+        <div class="card" style="flex:1;height:100%;padding:30px 40px" id="pcard"></div>
+        <button class="arrowbtn" id="pPrev" onclick="pr(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 6l-6 6 6 6"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== AI HUB -->
+<section class="screen" id="ai" data-title="כלי AI">
+  <!-- background = the approved design (title, text and tool tiles are part of the image); tiles are clickable hotspots -->
+  <button class="homebtn floating" onclick="go('home')" data-icon-home>דף הבית</button>
+  <div class="ai-actions">
+    <span class="hint">לחצו על הכלי שתרצו להכיר</span>
+    <button class="pillcta alt" onclick="openModal('m-aiprinciples',this)"><span class="ico sm bare" data-icon="bulb"></span>לחצו להרחבה על עקרונות השימוש ב-AI</button>
+  </div>
+  <div class="tools" id="tools"></div>
+</section>
+
+<!-- AI tool screens are generated from data (see AI_TOOLS in script) -->
+<div id="aiToolScreens"></div>
+
+<!-- ===================================================== END -->
+<section class="screen" id="end" data-title="סיום">
+  <div style="position:absolute;width:500px;height:500px;border-radius:50%;background:rgba(255,255,255,.07);right:-150px;top:-150px"></div>
+  <div style="position:absolute;width:360px;height:360px;border-radius:50%;background:rgba(120,160,255,.25);left:-100px;bottom:-120px"></div>
+  <div class="ecard">
+    <img src="assets/logo.png" alt="מאוחדת" style="height:46px;margin-bottom:16px">
+    <h1>כל הכבוד!</h1>
+    <span class="uline" style="margin:12px auto 16px"></span>
+    <p class="lead">סיימתם את הסיור במרכז הניהול במאוחדת. התכנים יישארו זמינים עבורכם בכל עת – חזרו אליהם כשתצטרכו.</p>
+    <p class="lead" style="font-weight:700;color:var(--navy)">בהצלחה בתפקיד החדש!</p>
+    <div class="elist" id="elist"></div>
+    <button class="btn btn-b" onclick="go('home')">חזרה למרכז הניהול</button>
+  </div>
+</section>
+
+<!-- ===================================================== MODALS -->
+<div class="modal-bg" id="m-survey"><div class="modal" style="width:960px;padding:28px 40px 24px">
+  <button class="x" onclick="closeModal()">×</button>
+  <div class="sv-head">
+    <div>
+      <span class="kicker">כיוון אסטרטגי 04 · סקר רופאים</span>
+      <h2 class="ih" style="font-size:28px;margin:0"><span class="ico lg" data-icon="chartup"></span>הקופה המועדפת על צוותים רפואיים</h2>
+      <p class="lead" style="margin:10px 0 0;font-size:17px">בשנת 2025 ערכנו סקר בקרב רופאים, בו הם העידו כי מאוחדת היא אכן הקופה המועדפת על פני הקופות האחרות!</p>
+    </div>
+    <div class="sv-flip">
+      <div class="sv-badge">מהפך</div>
+      <div class="sv-flip-row"><span class="from"><small>08.24</small>21%<em>מקום 2</em></span><b>←</b><span class="to"><small>11.25</small>30%<em>מקום 1</em></span></div>
+    </div>
+  </div>
+  <div class="sv-legend"><span class="sv-q">מהי הקופה המועדפת עליך?</span><span><i class="k old"></i>סקר 08.24</span><span><i class="k new"></i>סקר 11.25</span></div>
+  <div class="sv-chart" id="svChart"></div>
+  <p class="sv-note">שיעור המשיבים בכל קטגוריה. רחפו מעל עמודה להצגת הערך.</p>
+</div></div>
+
+<div class="modal-bg" id="m-jr-center"><div class="modal">
+  <button class="x" onclick="closeModal()">×</button>
+  <span class="kicker">מאוחדת ג'וניור</span><h2 class="ih" style="font-size:28px"><span class="ico lg" data-icon="headset"></span>מוקד ג'וניור</h2><span class="uline"></span>
+  <p class="lead">מענה של רופא ילדים <b>אונליין 24/7</b> באמצעות המיון ההיברידי, ומוקד אחיות להיוועצות רפואית.</p>
+  <div class="goal">המוקד נותן מענה לילדים מגיל 0 ועד גיל 18.</div>
+</div></div>
+
+<div class="modal-bg" id="m-jr-sites"><div class="modal">
+  <button class="x" onclick="closeModal()">×</button>
+  <span class="kicker">מאוחדת ג'וניור</span><h2 class="ih" style="font-size:28px"><span class="ico lg" data-icon="mappin"></span>מרכזי ג'וניור ברחבי הארץ</h2><span class="uline"></span>
+  <div style="display:flex;gap:26px;align-items:center">
+    <svg viewBox="0 0 160 300" width="150" style="flex:none"><path d="M88 6c10 8 14 20 12 34l10 22-6 18 6 30-10 26-6 40-14 50-12 60-8-40-10-50-6-40 4-30 8-26 4-34 10-30z" fill="#e3e9ff" stroke="#3f6bff" stroke-width="2"/><circle cx="96" cy="128" r="9" fill="#f7801e"/><circle cx="72" cy="122" r="9" fill="#f7801e"/><g fill="#3f6bff"><circle cx="90" cy="40" r="4"/><circle cx="84" cy="70" r="4"/><circle cx="70" cy="96" r="4"/><circle cx="66" cy="112" r="4"/><circle cx="80" cy="150" r="4"/><circle cx="74" cy="176" r="4"/><circle cx="96" cy="60" r="4"/><circle cx="62" cy="134" r="4"/></g></svg>
+    <div>
+      <p class="lead"><b style="color:var(--orange)">2 מרכזי ג'וניור גדולים:</b><br>מרכז מאוחדת ג'וניור בירושלים | מרכז ג'וניור במרכז רפואי ראם ברחובות</p>
+      <p class="lead"><b style="color:var(--blue)">ועוד 21 מרכזי מיני ג'וניור</b> שנפתחו ברחבי הארץ.</p>
+      <div class="goal">במרכזי בריאות הילד כל הרופאים הם מומחים ברפואת ילדים, וכל אחד ואחת מהם בעלי התמחות ספציפית ברפואה יועצת לילדים.</div>
+    </div>
+  </div>
+</div></div>
+
+<div class="modal-bg" id="m-jr-hand"><div class="modal">
+  <button class="x" onclick="closeModal()">×</button>
+  <span class="kicker">מאוחדת ג'וניור</span><h2 class="ih" style="font-size:28px"><span class="ico lg" data-icon="phoneheart"></span>בריאות בכף ידך</h2><span class="uline"></span>
+  <p>שירות מעקב וליווי רפואי יוזם (פרואקטיבי), המלווה הורים וילדים בכל אחד משלבי התפתחות הילד – מגיל לידה ועד גיל 6, ובקרוב עד גיל 18.</p>
+  <p>השירות כולל משימות להורים לטיפול רפואי שהתינוק או הילד נדרשים לו. המשימות מופיעות באפליקציית מאוחדת תחת הכפתור "בריאות הילד/ה", ונשלחות גם במייל, ב-SMS ובהודעה קולית לטלפונים כשרים.</p>
+  <h3 style="margin-top:6px">משימות לדוגמה:</h3>
+  <span class="chip">התחלת נטילת ברזל</span><span class="chip">חיסון גיל שנה וחצי</span><span class="chip">בדיקת אורטופד ילדים</span><span class="chip">ביקור בטיפת חלב</span><span class="chip">בדיקת רופא עיניים</span><span class="chip">ביקור אצל רופא ילדים</span>
+</div></div>
+
+<div class="modal-bg" id="m-jr-tyto"><div class="modal">
+  <button class="x" onclick="closeModal()">×</button>
+  <span class="kicker">מאוחדת ג'וניור</span><h2 class="ih" style="font-size:28px"><span class="ico lg" data-icon="stethoscope"></span>Tyto</h2><span class="uline"></span>
+  <div style="display:flex;gap:24px;align-items:center">
+    <div class="tyto-pic"><img src="assets/tyto.png" alt="מכשיר Tyto"></div>
+    <p class="lead">מכשיר הדוגם מדדים רפואיים, הנשלחים לרופא לצורך <b>בדיקת רופא מרחוק</b> – בשיחת וידאו היברידית.</p>
+  </div>
+</div></div>
+
+<div class="modal-bg" id="m-swot"><div class="modal" style="width:900px">
+  <button class="x" onclick="closeModal()">×</button>
+  <span class="kicker">כלי אבחון לבניית תכנית עבודה</span><h2 style="font-size:28px">ניתוח SWOT</h2><span class="uline"></span>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div style="background:var(--soft);border-radius:18px;padding:20px">
+      <span class="kicker">שלב 1</span><h3>מיפוי ממוקד</h3>
+      <p style="margin-bottom:8px">כתבו:</p>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:#fff;border-radius:12px;padding:10px"><b style="color:#16935f">S</b> 2 חוזקות משמעותיות של היחידה</div>
+        <div style="background:#fff;border-radius:12px;padding:10px"><b style="color:#c53030">W</b> 2 חולשות שמשפיעות על הביצועים</div>
+        <div style="background:#fff;border-radius:12px;padding:10px"><b style="color:var(--blue)">O</b> 2 הזדמנויות רלוונטיות לסביבה שלכם</div>
+        <div style="background:#fff;border-radius:12px;padding:10px"><b style="color:var(--orange)">T</b> 2 איומים ממשיים שדורשים מענה</div>
+      </div>
+      <p style="margin:12px 0 0;font-weight:700;color:var(--navy)">הסתמכו על נתונים, לא על תחושות.</p>
+    </div>
+    <div style="background:var(--soft);border-radius:18px;padding:20px">
+      <span class="kicker">שלב 2</span><h3>בחרו מוקד אחד לפעולה</h3>
+      <p style="margin-bottom:8px">שאלו:</p>
+      <ul class="dots"><li>איזה פער הוא המשמעותי ביותר?</li><li>איפה ניתן לייצר השפעה אמיתית השנה?</li><li>מה מחובר לכיוון אסטרטגי ארגוני?</li></ul>
+      <p style="margin:12px 0 0;font-weight:700;color:var(--navy)">בחרו נקודה אחת בלבד.</p>
+    </div>
+  </div>
+</div></div>
+
+<div class="modal-bg" id="m-impact"><div class="modal" style="width:940px">
+  <button class="x" onclick="closeModal()">×</button>
+  <span class="kicker">כלי לבחינת תיעדוף</span><h2 style="font-size:28px">תיעדוף מהלכים (Impact × Effort)</h2><span class="uline"></span>
+  <div style="display:flex;gap:26px">
+    <div style="flex:1">
+      <div style="display:flex;gap:10px;margin-bottom:10px"><div class="num">1</div><p style="margin:6px 0 0">רשמו את כל המהלכים האפשריים</p></div>
+      <div style="display:flex;gap:10px;margin-bottom:10px"><div class="num">2</div><p style="margin:6px 0 0">דרגו כל מהלך לפי שני פרמטרים:<br><b>השפעה על היעד</b> (נמוכה / בינונית / גבוהה)<br><b>מאמץ נדרש</b> (נמוך / בינוני / גבוה)</p></div>
+      <div style="display:flex;gap:10px;margin-bottom:14px"><div class="num">3</div><p style="margin:6px 0 0">מקמו בריבוע התיעדוף</p></div>
+      <div class="tip"><div class="t" style="font-size:16px">איך משתמשים בזה בפועל?</div>
+        <ul class="dots" style="font-size:15px"><li>התחילו ממהלכים בעלי השפעה גבוהה ומאמץ נמוך</li><li>אל תעמיסו על השנה מהלכים כבדים מדי</li><li>ודאו שיש איזון בין "מהיר להשגה" לבין "מהלך אסטרטגי משמעותי"</li></ul></div>
+    </div>
+    <div class="matrix">
+      <div class="ax" style="writing-mode:vertical-rl">השפעה גבוהה</div>
+      <div class="c" style="background:linear-gradient(135deg,#ffa24a,#f7801e);color:#fff">⭐ התחילו כאן<br>השפעה גבוהה · מאמץ נמוך</div>
+      <div class="c" style="background:#dfe6ff;color:var(--navy)">מהלכים אסטרטגיים<br>השפעה גבוהה · מאמץ גבוה</div>
+      <div class="ax" style="writing-mode:vertical-rl">השפעה נמוכה</div>
+      <div class="c" style="background:#eef2ff;color:var(--navy)">השפעה נמוכה · מאמץ נמוך</div>
+      <div class="c" style="background:#f3f3f6;color:#888">השפעה נמוכה · מאמץ גבוה</div>
+      <div></div><div class="ax">מאמץ נמוך</div><div class="ax">מאמץ גבוה</div>
+    </div>
+  </div>
+</div></div>
+
+<div class="modal-bg" id="m-smart"><div class="modal" style="width:880px">
+  <button class="x" onclick="closeModal()">×</button>
+  <span class="kicker">כלי להגדרת יעדים</span><h2 style="font-size:28px">מודל SMART</h2><span class="uline"></span>
+  <div class="smart" id="smartBtns"></div>
+  <div id="smartBody"></div>
+</div></div>
+
+<div class="modal-bg" id="m-aiprinciples"><div class="modal" style="width:900px">
+  <button class="x" onclick="closeModal()">×</button>
+  <span class="kicker">איך משתמשים בו נכון?</span><h2 style="font-size:28px">עקרונות השימוש ב-AI</h2><span class="uline"></span>
+  <div class="grid" style="grid-template-columns:repeat(5,1fr);gap:10px">
+    <div style="background:var(--soft);border-radius:14px;padding:12px;text-align:center"><span class="ico lg bare" data-icon="crown"></span><b style="color:var(--navy)">ההקשר הוא המלך</b></div>
+    <div style="background:var(--soft);border-radius:14px;padding:12px;text-align:center"><span class="ico lg bare" data-icon="iterate"></span><b style="color:var(--navy)">תהליך איטרטיבי</b></div>
+    <div style="background:var(--soft);border-radius:14px;padding:12px;text-align:center"><span class="ico lg bare" data-icon="humanloop"></span><b style="color:var(--navy)">לא לצאת מהלופ</b><br><small>Human in the loop</small></div>
+    <div style="background:var(--soft);border-radius:14px;padding:12px;text-align:center"><span class="ico lg bare" data-icon="stopwatch"></span><b style="color:var(--navy)">Impact over Hype</b><br><small>כל שימוש חייב להצדיק זמן שנחסך</small></div>
+    <div style="background:var(--soft);border-radius:14px;padding:12px;text-align:center"><span class="ico lg bare" data-icon="cloud"></span><b style="color:var(--navy)">Copilot עובד טוב</b><br><small>כשהמידע בענן</small></div>
+  </div>
+  <h3 style="margin-top:22px">המרשם שעובד: מטרה ← הקשר ← מקור ← ציפיות</h3>
+  <div class="recipe">
+    <div><b>מטרה</b><span>הגדרת המטרה</span></div>
+    <div><b>הקשר</b><span>אני ____ / הקהל הוא ____ / טון ____</span></div>
+    <div><b>מקור</b><span>השתמש ב____ (שרשור / מסמך / קובץ / פגישה)</span></div>
+    <div><b>ציפיות</b><span>החזר בפורמט ____ (נקודות / טבלה / צעדים), עד ____ נקודות, הדגש ____</span></div>
+  </div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ============ scaling ============ */
+function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);document.getElementById('stage').style.transform='scale('+s+')'}
+addEventListener('resize',fit);fit();
+
+/* ============ icons ============ */
+const ICONS={
+ arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"/></svg>',
+ workplan:'<svg viewBox="0 0 64 64"><defs><linearGradient id="gb1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f7bff"/><stop offset="1" stop-color="#2b33d6"/></linearGradient></defs><rect x="12" y="6" width="34" height="46" rx="6" fill="url(#gb1)"/><rect x="18" y="15" width="4" height="4" rx="1" fill="#fff"/><rect x="25" y="15" width="15" height="4" rx="2" fill="#fff"/><rect x="18" y="24" width="4" height="4" rx="1" fill="#fff"/><rect x="25" y="24" width="15" height="4" rx="2" fill="#c9d6ff"/><rect x="18" y="33" width="4" height="4" rx="1" fill="#fff"/><rect x="25" y="33" width="11" height="4" rx="2" fill="#c9d6ff"/><circle cx="45" cy="45" r="12" fill="#f7801e"/><path d="M39 45l4 4 8-8" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ strategy:'<svg viewBox="0 0 64 64"><path d="M32 4l5 1 1 6 5 2 5-4 4 4-4 5 2 5 6 1 1 5-1 5-6 1-2 5 4 5-4 4-5-4-5 2-1 6-5 1-5-1-1-6-5-2-5 4-4-4 4-5-2-5-6-1-1-5 1-5 6-1 2-5-4-5 4-4 5 4 5-2 1-6z" fill="#2b47e6"/><circle cx="32" cy="32" r="16" fill="#fff"/><circle cx="32" cy="28" r="5" fill="#f7801e"/><path d="M23 41c2-6 6-8 9-8s7 2 9 8z" fill="#f7801e"/></svg>',
+ leadership:'<svg viewBox="0 0 64 64"><path d="M4 22l12-8 10 6-12 16z" fill="#f7801e"/><path d="M60 22l-12-8-10 6 12 16z" fill="#f7801e"/><path d="M16 22l10-5 8 3 8-3 10 7-4 12-14 12c-2 2-5 2-7 0L14 36z" fill="#2b47e6"/><path d="M26 20l8 8c2 2 5 2 6 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M22 38l6 6M27 34l6 6M32 31l6 6" stroke="#90a8ff" stroke-width="2" stroke-linecap="round"/></svg>',
+ ai:'<svg viewBox="0 0 64 64"><g stroke="#f7801e" stroke-width="2.4"><path d="M24 8v8M32 6v10M40 8v8M24 48v8M32 48v10M40 48v8M8 24h8M6 32h10M8 40h8M48 24h8M48 32h10M48 40h8"/></g><g fill="#f7801e"><circle cx="24" cy="7" r="2.6"/><circle cx="40" cy="7" r="2.6"/><circle cx="24" cy="57" r="2.6"/><circle cx="40" cy="57" r="2.6"/><circle cx="7" cy="24" r="2.6"/><circle cx="7" cy="40" r="2.6"/><circle cx="57" cy="24" r="2.6"/><circle cx="57" cy="40" r="2.6"/></g><rect x="15" y="15" width="34" height="34" rx="8" fill="#2b47e6"/><text x="32" y="39" text-anchor="middle" font-family="Heebo,Arial" font-weight="900" font-size="17" fill="#fff">AI</text></svg>',
+ data:'<svg viewBox="0 0 64 64"><rect x="8" y="34" width="12" height="22" rx="3" fill="#3f6bff"/><rect x="26" y="22" width="12" height="34" rx="3" fill="#f7801e"/><rect x="44" y="6" width="12" height="50" rx="3" fill="#2b33d6"/></svg>',
+ performance:'<svg viewBox="0 0 64 64"><circle cx="14" cy="22" r="7" fill="#2b47e6"/><circle cx="50" cy="22" r="7" fill="#2b47e6"/><path d="M2 48c0-10 6-15 12-15s12 5 12 15z" fill="#2b47e6"/><path d="M38 48c0-10 6-15 12-15s12 5 12 15z" fill="#2b47e6"/><circle cx="32" cy="16" r="9" fill="#2b33d6"/><path d="M16 56c0-14 7-21 16-21s16 7 16 21z" fill="#f7801e"/></svg>',
+ procurement:'<svg viewBox="0 0 64 64"><path d="M6 22l22-8 22 8-22 9z" fill="#ffa24a"/><path d="M6 22v24l22 10V31z" fill="#f7801e"/><path d="M50 22v12l-22 22V31z" fill="#e86b0c"/><path d="M14 18l22 9" stroke="#fff" stroke-width="4"/><circle cx="48" cy="48" r="12" fill="#2b47e6"/><circle cx="48" cy="48" r="4.5" fill="#fff"/><g stroke="#2b47e6" stroke-width="4" stroke-linecap="round"><path d="M48 33v4M48 59v4M33 48h4M59 48h4M37.4 37.4l2.8 2.8M55.8 55.8l2.8 2.8M37.4 58.6l2.8-2.8M55.8 40.2l2.8-2.8"/></g></svg>',
+ bulb:'<svg viewBox="0 0 40 40"><path d="M20 4a11 11 0 00-6 20v4h12v-4A11 11 0 0020 4z" fill="#ffa24a"/><rect x="15" y="30" width="10" height="4" rx="2" fill="#2b33d6"/></svg>',
+ send:'<svg viewBox="0 0 40 40"><rect x="6" y="6" width="22" height="28" rx="4" fill="#3f6bff"/><path d="M11 14h12M11 20h12M11 26h7" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="30" cy="28" r="8" fill="#f7801e"/><path d="M27 28h6M31 25l3 3-3 3" stroke="#fff" stroke-width="2" fill="none"/></svg>',
+ check:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#3f6bff"/><path d="M13 20l5 5 9-10" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ gauge:'<svg viewBox="0 0 40 40"><path d="M5 28a15 15 0 0130 0" stroke="#3f6bff" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M20 28l7-10" stroke="#f7801e" stroke-width="3.4" stroke-linecap="round"/><circle cx="20" cy="28" r="3.4" fill="#2b33d6"/></svg>',
+ flag:'<svg viewBox="0 0 40 40"><path d="M10 5v31" stroke="#2b33d6" stroke-width="3" stroke-linecap="round"/><path d="M11 7h20l-4 7 4 7H11z" fill="#f7801e"/></svg>',
+ home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z"/></svg>'
+};
+/* ---- organisation icon style: dark-grey outline + flat orange accents (see מאוחדת app icons) ---- */
+const K='#4d4d4d',OR='#f7941d';
+const G=`fill="none" stroke="${K}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"`;
+const S=b=>`<svg viewBox="0 0 48 48">${b}</svg>`;
+const D=(d,x='')=>`<path d="${d}" ${G} ${x}/>`;
+const F=d=>`<path d="${d}" fill="${OR}"/>`;
+const FO=d=>`<path d="${d}" fill="${OR}" stroke="${K}" stroke-width="2" stroke-linejoin="round"/>`;
+const docShape=D('M9 4h18l8 8v31H9z')+F('M27 4v8h8z')+D('M14 18h14M14 24h14M14 30h8');
+Object.assign(ICONS,{
+ target:S(`<circle cx="22" cy="26" r="16" ${G}/><circle cx="22" cy="26" r="9" ${G}/><circle cx="22" cy="26" r="3.5" fill="${OR}"/>`+D('M22 26L38 10')+F('M35 5l2 6 6 2-4 4-6-2-2-6z')),
+ network:S(D('M24 24L10 10M24 24L38 10M24 24L10 38M24 24L38 38')+[[10,10],[38,10],[10,38],[38,38]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="#fff" stroke="${K}" stroke-width="2"/>`).join('')+`<circle cx="24" cy="24" r="7" fill="${OR}"/>`),
+ medal:S(F('M15 3h8l5 13h-8z')+D('M33 3h-8l-5 13h8z')+`<circle cx="24" cy="30" r="12" fill="#fff" ${G}/>`+F('M24 23.5l2 4.1 4.5.6-3.2 3.2.8 4.5-4.1-2.1-4.1 2.1.8-4.5-3.2-3.2 4.5-.6z')),
+ growth:S(FO('M13 31h22l-3 13H16z')+D('M24 31V15M24 21c0-8 5-13 14-13 0 9-5 13-14 13zM24 26c0-6-4-10-11-10 0 7 4 10 11 10z')),
+ think:S(D('M9 22c0-9 7-15 15-15s15 6 15 14-6 13-15 13h-2l-7 6v-7c-4-2-6-6-6-11z')+`<text x="24" y="27.5" text-anchor="middle" font-family="Heebo,Arial" font-weight="900" font-size="15" fill="${OR}">?</text><circle cx="38" cy="40" r="2.5" fill="${OR}"/><circle cx="43" cy="45" r="1.6" fill="${OR}"/>`),
+ bulb:S(D('M24 6a11 11 0 00-6.5 19.8V30h13v-4.2A11 11 0 0024 6z')+`<rect x="17.5" y="32" width="13" height="5" rx="1.5" fill="${OR}"/>`+D('M20 41h8M21 19l3 3 3-3M24 22v7M24 1.5v1M9.5 8l1.5 1.5M38.5 8L37 9.5M5 19h2M41 19h2')),
+ pin:S(FO('M17 5h14l-2 12 6 6H13l6-6z')+D('M24 23v21')),
+ warning:S(D('M24 5l20 36H4z')+`<path d="M24 17v11" stroke="${OR}" stroke-width="3.2" stroke-linecap="round"/><circle cx="24" cy="34" r="2.2" fill="${OR}"/>`),
+ building:S(FO('M6 15L24 5l18 10z')+D('M8 19h32M11 22v14M19 22v14M29 22v14M37 22v14M8 37h32M5 42h38')),
+ lock:S(D('M16 21v-6a8 8 0 0116 0v6')+`<rect x="10" y="21" width="28" height="22" rx="4" fill="${OR}"/><circle cx="24" cy="30" r="3" fill="#fff"/><path d="M24 32v5" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>`),
+ laptopbolt:S(`<rect x="8" y="8" width="32" height="22" rx="2" ${G}/>`+D('M4 35h40l-3 5H7z')+F('M26.5 11L19 21h5l-2 7 7.5-10h-5z')),
+ docsclock:S(docShape+`<circle cx="36" cy="36" r="9" fill="${OR}"/><path d="M36 31v5l3 2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>`),
+ doccheck:S(docShape+`<circle cx="36" cy="36" r="9" fill="${OR}"/><path d="M32 36l3 3 5-6" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`),
+ ban:S(`<circle cx="24" cy="24" r="17" fill="#fff" stroke="${OR}" stroke-width="4"/><path d="M12 12l24 24" stroke="${OR}" stroke-width="4"/>`),
+ calendar:S(`<rect x="6" y="9" width="36" height="33" rx="3" ${G}/>`+F('M9 9h30a3 3 0 013 3v5H6v-5a3 3 0 013-3z')+D('M15 5v7M33 5v7')+`<g fill="${K}"><circle cx="15" cy="25" r="1.8"/><circle cx="24" cy="25" r="1.8"/><circle cx="33" cy="25" r="1.8"/><circle cx="15" cy="34" r="1.8"/><circle cx="24" cy="34" r="1.8"/></g><rect x="30.5" y="31.5" width="5" height="5" rx="1" fill="${OR}"/>`),
+ search:S(`<circle cx="20" cy="20" r="12" ${G}/><path d="M29 29l12 12" stroke="${OR}" stroke-width="5" stroke-linecap="round"/>`),
+ headset:S(D('M9 26v-4a15 15 0 0130 0v4')+`<rect x="6" y="24" width="8" height="12" rx="3" fill="${OR}"/><rect x="34" y="24" width="8" height="12" rx="3" fill="${OR}"/>`+D('M38 36c0 4-4 6-10 6')+`<circle cx="26" cy="42" r="2.5" fill="${K}"/>`),
+ mappin:S(D('M24 4a13 13 0 00-13 13c0 10 13 24 13 24s13-14 13-24A13 13 0 0024 4zM15 44h18')+`<circle cx="24" cy="17" r="5" fill="${OR}"/>`),
+ phoneheart:S(`<rect x="13" y="4" width="22" height="40" rx="4" ${G}/>`+D('M21 9h6')+F('M24 31s-7-4.2-7-9a3.7 3.7 0 017-1.8 3.7 3.7 0 017 1.8c0 4.8-7 9-7 9z')),
+ stethoscope:S(D('M11 5v10a8 8 0 0016 0V5M8 5h6M24 5h6M19 23v6a9 9 0 0018 0v-3')+`<circle cx="37" cy="21" r="5" fill="${OR}"/>`),
+ crown:S(D('M6 16l9 8 9-13 9 13 9-8-4 21H10z')+`<rect x="10" y="38" width="28" height="5" rx="1.5" fill="${OR}"/><circle cx="24" cy="8" r="2.5" fill="${OR}"/><circle cx="6" cy="13" r="2" fill="${OR}"/><circle cx="42" cy="13" r="2" fill="${OR}"/>`),
+ iterate:S(D('M37 19A14 14 0 0011 15M8 8v8h8')+`<path d="M11 29a14 14 0 0026 4M40 40v-8h-8" stroke="${OR}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`),
+ humanloop:S(D('M38 12A17 17 0 1041 25M33 6l5 6-7 2')+`<circle cx="24" cy="19" r="4.5" fill="${OR}"/>`+F('M15 34c0-6 4-9 9-9s9 3 9 9z')),
+ stopwatch:S(`<circle cx="24" cy="27" r="16" ${G}/>`+D('M20 4h8M24 4v7M37 12l3-3')+`<path d="M24 27v-9" stroke="${OR}" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="27" r="2.6" fill="${OR}"/>`),
+ cloud:S(D('M14 38a9 9 0 01-1-18 12 12 0 0123-3 10 10 0 011 21z')+`<path d="M24 34V22M19 27l5-5 5 5" stroke="${OR}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`),
+ chartup:S(D('M5 43h38')+`<rect x="9" y="29" width="7" height="14" ${G}/><rect x="21" y="22" width="7" height="21" ${G}/>`+FO('M33 15h7v28h-7z')+`<path d="M8 21l9-7 7 4 12-10M31 6h6v6" stroke="${OR}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`),
+ personchart:S(`<circle cx="14" cy="13" r="6" ${G}/>`+D('M4 38c0-8 4-13 10-13s10 5 10 13M28 43h17')+`<rect x="29" y="31" width="4" height="12" fill="${OR}"/><rect x="35" y="25" width="4" height="18" fill="${OR}"/><rect x="41" y="18" width="4" height="25" fill="${OR}"/>`),
+ chat:S(D('M6 6h22a4 4 0 014 4v9a4 4 0 01-4 4H14l-6 5v-5H6a4 4 0 01-4-4v-9a4 4 0 014-4z')+`<g fill="${K}"><circle cx="11" cy="14.5" r="1.6"/><circle cx="17" cy="14.5" r="1.6"/><circle cx="23" cy="14.5" r="1.6"/></g>`+F('M22 24h20a4 4 0 014 4v8a4 4 0 01-4 4h-1v5l-6-5H22a4 4 0 01-4-4v-8a4 4 0 014-4z')),
+ routine:S(`<rect x="4" y="8" width="28" height="26" rx="3" ${G}/>`+D('M4 15h28M11 5v6M25 5v6')+`<circle cx="35" cy="35" r="9.5" fill="${OR}"/><path d="M30.5 35a4.5 4.5 0 017.8-3M39.5 35a4.5 4.5 0 01-7.8 3M38.5 29v3.2h-3.2M31.5 41v-3.2h3.2" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`),
+ trophy:S(FO('M14 6h20v9a10 10 0 01-20 0z')+D('M14 9H8v3a6 6 0 006 6M34 9h6v3a6 6 0 01-6 6M24 25v8M18 33h12v9H18zM15 42h18')),
+ form:S(`<rect x="9" y="7" width="26" height="36" rx="3" ${G}/><rect x="16" y="4" width="12" height="6" rx="2" fill="${OR}"/>`+D('M15 18h14M15 24h14M15 30h8')+FO('M29 41l1.5-6 10-10 4.5 4.5-10 10z')),
+ gavel:S(`<g transform="rotate(-40 24 20)">${FO('M13 6h22v10H13z')}${D('M24 16v22')}</g>`+D('M6 43h22')),
+ cart:S(D('M3 6h6l5 23h24l4-15H12')+`<circle cx="17" cy="38" r="3" ${G}/><circle cx="34" cy="38" r="3" ${G}/><rect x="18" y="12" width="9" height="9" rx="1" fill="${OR}"/><rect x="28" y="15" width="7" height="6" rx="1" fill="${OR}" opacity=".7"/>`),
+ compass:S(`<circle cx="24" cy="24" r="18" ${G}/>`+D('M31 17l-5 9-9 5 5-9z')+F('M31 17l-9 5 4 4z')+`<g fill="${K}"><circle cx="24" cy="9.5" r="1.3"/><circle cx="38.5" cy="24" r="1.3"/><circle cx="24" cy="38.5" r="1.3"/><circle cx="9.5" cy="24" r="1.3"/></g>`),
+ rocket:S(D('M24 4c7 5 10 14 9 24H15c-1-10 2-19 9-24zM15 22l-6 9 7-1M33 22l6 9-7-1')+`<circle cx="24" cy="17" r="3.5" ${G}/>`+F('M19 32h10l-5 12z')),
+ people:S(`<circle cx="24" cy="13" r="6" fill="${OR}"/>`+F('M13 42c0-10 5-16 11-16s11 6 11 16z')+`<circle cx="10" cy="17" r="4.5" ${G}/><circle cx="38" cy="17" r="4.5" ${G}/>`+D('M2 39c0-7 3-11 8-11M46 39c0-7-3-11-8-11')),
+ kids:S(`<circle cx="17" cy="14" r="6" ${G}/>`+D('M7 43c0-11 4-18 10-18s10 7 10 18M36 22c-2 6 2 9-6 14')+`<ellipse cx="36" cy="13" rx="7" ry="9" fill="${OR}"/>`),
+ careheart:S(F('M24 24s-10-6-10-12a5.5 5.5 0 0110-2.6A5.5 5.5 0 0134 12c0 6-10 12-10 12z')+D('M4 31h7l8 4h8a3 3 0 010 6h-9M27 41l11-6a3 3 0 013.5 4.6L30 46H12')),
+ doctor:S(`<circle cx="24" cy="12" r="7" ${G}/>`+D('M8 44c0-12 7-19 16-19s16 7 16 19M19 26l5 9 5-9')+`<rect x="29" y="32" width="9" height="9" rx="1.5" fill="${OR}"/><path d="M33.5 34v5M31 36.5h5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>`),
+ maplocal:S(D('M4 12l12-5 16 5 12-5v30l-12 5-16-5-12 5zM16 7v30M32 12v30')+F('M24 8a7 7 0 00-7 7c0 5 7 12 7 12s7-7 7-12a7 7 0 00-7-7z')+`<circle cx="24" cy="15" r="2.5" fill="#fff"/>`),
+ plane:S(D('M44 5L4 21l12 5 3 14 6-9 10 7zM16 26L44 5')+F('M10 45s-6-3.5-6-7.5a3 3 0 016-1.3 3 3 0 016 1.3c0 4-6 7.5-6 7.5z')),
+ shieldplus:S(D('M24 4l17 6v12c0 11-7 18-17 22C14 40 7 33 7 22V10z')+`<path d="M24 15v15M16.5 22.5h15" stroke="${OR}" stroke-width="4" stroke-linecap="round"/>`),
+ apple:S(FO('M24 15c-4-4-17-3-17 10 0 10 7 19 13 19 2 0 3-1.5 4-1.5s2 1.5 4 1.5c6 0 13-9 13-19 0-13-13-14-17-10z')+D('M24 15c0-4 1.5-7 4-9M27 9c4-5 10-3 11-1-3 5-9 5-11 1z')),
+ tooth:S(D('M10 7c4-3 9-1 14-1s10-2 14 1c4 4 3 12 1 17-1.5 4-1.5 9-3 15-1 4.5-5 6-6 0-.8-4.5-1.5-9-6-9s-5.2 4.5-6 9c-1 6-5 4.5-6 0-1.5-6-1.5-11-3-15-2-5-3-13 1-17z')+F('M41 2l1.5 3.5L46 7l-3.5 1.5L41 12l-1.5-3.5L36 7l3.5-1.5z')),
+ gauge:S(D('M6 36a18 18 0 0136 0M10.5 25l3 1.8M24 18v3.5M37.5 25l-3 1.8M6 40h36')+`<path d="M24 36l9-11" stroke="${OR}" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="36" r="3" fill="${OR}"/>`),
+ steps:S(D('M4 43h10v-9h10v-9h10v-9h10v27H4z')+FO('M37 15V4l7 3.5-7 3.5')),
+ flag:S(D('M10 45V5')+FO('M10 7h26l-5 7 5 7H10z')),
+ send:S(D('M8 4h18l8 8v31H8z')+F('M26 4v8h8z')+D('M13 18h14M13 24h10')+`<circle cx="36" cy="36" r="9" fill="${OR}"/><path d="M32 36h8M37 33l3 3-3 3" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`),
+ check:S(`<circle cx="24" cy="24" r="18" ${G}/><path d="M16 24l6 6 11-12" stroke="${OR}" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`),
+ toolbox:S(`<rect x="5" y="16" width="38" height="25" rx="3" ${G}/>`+D('M17 16v-5a2 2 0 012-2h10a2 2 0 012 2v5M5 26h38')+`<rect x="20" y="22" width="8" height="8" rx="1.5" fill="${OR}"/>`),
+ smile:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" fill="#fff"/><path d="M20 26q4-5 8 0M36 26q4-5 8 0" stroke="#f7801e" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M19 37q13 13 26 0" stroke="#f7801e" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`
+});
+/* white version (outline -> white, orange kept) for icons on coloured backgrounds */
+const W=s=>s.replace(/#4d4d4d/g,'#fff');
+/* all-white version for icons on orange buttons */
+const WW=s=>W(s).replace(/#f7941d/g,'#fff');
+function paintIcons(root){root.querySelectorAll('[data-icon]').forEach(el=>{if(!el.dataset.painted){const s=ICONS[el.dataset.icon]||'';el.insertAdjacentHTML('afterbegin',el.dataset.white?W(s):s);el.dataset.painted=1}})}
+
+/* ============ topic chrome (top bar on each topic) ============ */
+document.querySelectorAll('.screen.topic').forEach(s=>{
+  s.insertAdjacentHTML('beforeend',`<div class="topbar"><img class="logo" src="assets/logo.png" alt="מאוחדת" onclick="go('home')"><div class="crumbs"><a onclick="go('home')">מרכז הניהול</a>›<b>${s.dataset.title}</b></div><button class="homebtn" onclick="go('home')">${ICONS.home}דף הבית</button></div>`);
+});
+document.querySelectorAll('[data-icon-home]').forEach(b=>b.insertAdjacentHTML('afterbegin',ICONS.home));
+
+/* ============ navigation & progress ============ */
+const TOPICS={ai:'כלי AI',leadership:'מודל הניהול והמנהיגות',strategy:'אסטרטגיית מאוחדת',workplan:'תכנית העבודה במאוחדת',procurement:'יסודות הרכש',performance:'הערכת ביצועים',data:'ניהול מבוסס נתונים'};
+const visited=new Set();
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id); el.classList.add('active');
+  closeModal();
+  const t=id.startsWith('ai-')?'ai':id;
+  if(TOPICS[t]) visited.add(t);
+  updateProgress();
+}
+function updateProgress(){
+  document.querySelectorAll('.tcard').forEach(c=>c.classList.toggle('visited',visited.has(c.dataset.topic)));
+  document.getElementById('progTxt').textContent=visited.size+' מתוך 7 נושאים';
+  document.getElementById('progBar').style.width=(visited.size/7*100)+'%';
+  document.getElementById('elist').innerHTML=Object.entries(TOPICS).map(([k,v])=>`<span class="${visited.has(k)?'ok':''}">${visited.has(k)?'✓ ':''}${v}</span>`).join('');
+}
+function welcomeStep(n){document.querySelectorAll('#welcome .step').forEach((s,i)=>s.classList.toggle('on',i===n))}
+
+function wpPart(i,b){b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('#workplan .wppart').forEach((p,k)=>p.classList.toggle('on',k===i))}
+/* ============ tabs ============ */
+function tab(group,idx){
+  const tabs=document.querySelectorAll(`.tabs[data-group="${group}"] .tab`);
+  const panels=document.querySelectorAll(`.pcontent[data-group="${group}"] > .panel`);
+  tabs.forEach((t,i)=>{t.classList.toggle('on',i===idx); if(i===idx)t.classList.add('seen')});
+  panels.forEach((p,i)=>p.classList.toggle('on',i===idx));
+  /* end of chapter: highlight the "back to home" button */
+  const scr=tabs[0].closest('.screen'), hb=scr&&scr.querySelector('.topbar .homebtn');
+  if(hb){const end=idx===tabs.length-1;hb.classList.toggle('cta',end);hb.lastChild.textContent=end?'סיימתם את הפרק! חזרה לדף הבית':'דף הבית'}
+}
+document.querySelectorAll('.tabs').forEach(tb=>{
+  tb.querySelectorAll('.tab').forEach((t,i)=>t.addEventListener('click',()=>tab(tb.dataset.group,i)));
+  tb.querySelector('.tab').classList.add('seen');
+});
+
+/* ============ modals / links ============ */
+function openModal(id,src){closeModal();document.getElementById(id).classList.add('on');if(src&&src.classList)src.classList.add('done');if(id==='m-survey')playSurvey()}
+/* doctors survey – source: chart in the script PPTX (slide 14) */
+const SURVEY=[
+ {n:'מאוחדת',img:'assets/logo-meuhedet.png',a:21,b:30,me:1},
+ {n:'מכבי',img:'assets/logo-maccabi.png',a:31,b:24},
+ {n:'כללית',img:'assets/logo-clalit.png',a:5,b:5},
+ {n:'לאומית',img:'assets/logo-leumit.png',a:3,b:2},
+ {n:'כולם אותו דבר',a:11,b:10},
+ {n:'לא יודע/ת',a:29,b:30}
+];
+const SVMAX=40;
+document.getElementById('svChart').innerHTML=SURVEY.map(r=>`<div class="sv-row ${r.me?'me':''}">
+  <div class="sv-name">${r.img?`<img src="${r.img}" alt="${r.n}">`:r.n}</div>
+  <div class="sv-bars">
+    <div class="sv-bar old"><i data-w="${r.a/SVMAX*100}" title="${r.n} · סקר 08.24: ${r.a}%"></i><span>${r.a}%</span></div>
+    <div class="sv-bar new"><i data-w="${r.b/SVMAX*100}" title="${r.n} · סקר 11.25: ${r.b}%"></i><span>${r.b}%</span></div>
+  </div></div>`).join('');
+function playSurvey(){const c=document.getElementById('svChart');c.classList.remove('play');c.querySelectorAll('.sv-bar i').forEach(i=>i.style.width=0);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{c.querySelectorAll('.sv-bar i').forEach(i=>i.style.width=i.dataset.w+'%');c.classList.add('play')}))}
+function closeModal(){document.querySelectorAll('.modal-bg.on').forEach(m=>m.classList.remove('on'))}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal()}));
+addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+let tt;function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200)}
+/* LINKS: replace '#' with real URLs */
+const LINKS={'questionnaire':'#','strategy-deck':'#','workplan-helper':'#','procurement-procedure':'#'};
+function openLink(b){const u=LINKS[b.dataset.link];if(u&&u!=='#')window.open(u,'_blank');else toast('הקישור יוטמע בגרסה הסופית')}
+
+/* ============ leadership wheel ============ */
+const QUADS=[
+ {name:'התווית כיוון ודרך',lines:['התווית','כיוון ודרך'],comps:['מטרה ארגונית משותפת','חשיבה ותכנון קדימה','ניהול שותפויות אפקטיבי'],c1:'#4f7bff',c2:'#2b33d6',ic:'compass'},
+ {name:'הובלה לביצועים',lines:['הובלה','לביצועים'],comps:['מחויבות לאיכות ומוכוונות לתוצאות','מיקוד לקוח (פנימי וחיצוני)','ניהול משאבים מושכל'],c1:'#ffb066',c2:'#f7801e',ic:'chartup'},
+ {name:'הובלת אנשים',lines:['הובלת','אנשים'],comps:['דוגמה אישית המבטאת את ערכי הארגון','מנהיגות מחברת ומחוברת','בניית חוסן אישי וצוותי'],c1:'#6a86ff',c2:'#3a48e0',ic:'people'},
+ {name:'פתיחות ואומץ ניהולי',lines:['פתיחות','ואומץ ניהולי'],comps:['פתיחות וסקרנות אישית','אומץ לשנות ולהשתנות','פיתוח הדור הבא'],c1:'#ffc07f',c2:'#fa9238',ic:'rocket'}
+];
+(function buildWheel(){
+  const svg=document.getElementById('wheel'),cx=220,cy=220,R=205,r=92,g=3.5;
+  const P=(a,rad)=>[cx+rad*Math.cos(a*Math.PI/180),cy+rad*Math.sin(a*Math.PI/180)];
+  let h='<defs>'+QUADS.map((q,i)=>`<linearGradient id="qg${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${q.c1}"/><stop offset="1" stop-color="${q.c2}"/></linearGradient>`).join('')+'</defs>';
+  const starts=[-135,-45,45,135];
+  QUADS.forEach((q,i)=>{
+    const a0=starts[i]+g,a1=starts[i]+90-g;
+    const [x0,y0]=P(a0,R),[x1,y1]=P(a1,R),[x2,y2]=P(a1,r),[x3,y3]=P(a0,r);
+    const mid=starts[i]+45,[tx,ty]=P(mid,150);
+    h+=`<g class="q" data-i="${i}" onclick="pickQuad(${i})"><path d="M${x0},${y0} A${R},${R} 0 0 1 ${x1},${y1} L${x2},${y2} A${r},${r} 0 0 0 ${x3},${y3}Z" fill="url(#qg${i})"/>
+      <text x="${tx}" y="${ty-6}" text-anchor="middle" fill="#fff" font-size="19">${q.lines[0]}</text><text x="${tx}" y="${ty+18}" text-anchor="middle" fill="#fff" font-size="19">${q.lines[1]}</text></g>`;
+  });
+  h+=`<circle cx="${cx}" cy="${cy}" r="${r-12}" fill="#fff" stroke="#e3e8f7" stroke-width="2"/><text x="${cx}" y="${cy-6}" text-anchor="middle" fill="#16196b" font-size="20">מודל ניהול</text><text x="${cx}" y="${cy+20}" text-anchor="middle" fill="#f7801e" font-size="20">ומנהיגות</text>`;
+  svg.innerHTML=h;
+})();
+function pickQuad(i){
+  const q=QUADS[i];
+  document.querySelectorAll('#wheel .q').forEach(g=>{g.style.opacity=(+g.dataset.i===i)?1:.45});
+  document.getElementById('qtitle').innerHTML=`<span class="ico">${ICONS[q.ic]}</span>${q.name}`;
+  document.getElementById('qcomps').innerHTML=q.comps.map((c,k)=>`<div class="comp"><div class="num ${i%2?'o':''}">${k+1}</div>${c}</div>`).join('');
+  qseen.add(i);
+  document.querySelectorAll('#qprog span').forEach((s,k)=>s.classList.toggle('on',k<qseen.size));
+  document.getElementById('qcount').textContent=qseen.size+'/4 מרכיבים נצפו';
+  if(qseen.size===4)document.getElementById('qnext').classList.add('show');
+}
+const qseen=new Set();
+
+/* ============ strategy directions ============ */
+const DIRS=[
+ {ic:'kids',t:'הקופה האטרקטיבית ביותר לילדים',i:'מאוחדת פועלת ליצירת בידול משמעותי בשירותים לילדים, באמצעות חיזוק תחום קופות הבחירה, הרחבת שירותים ייחודיים ופיתוח חוויית שירות מותאמת למשפחות.',l:['הרחבת והנגשת שירותי רפואה ייעודיים לילדים','פיתוח תכניות ושירותים חדשניים','שיתופי פעולה ותכניות מניעה ייעודיות','חוויית שירות מותאמת למשפחה'],g:'להוביל את תחום בריאות הילדים ולהיות הבחירה המועדפת למשפחות בישראל.'},
+ {ic:'stethoscope',t:'רפואה ראשונית מצוינת',i:'הרפואה הראשונית היא הבסיס לפעילות הרפואית במאוחדת ונקודת המפגש המרכזית עם הלקוח. מאוחדת מחויבת להוביל ברפואה ראשונית איכותית, זמינה ומבוססת אמון – באמצעות:',l:['זמינות גבוהה של רופאי משפחה לילדים, נשים ומבוגרים','שיעור גבוה של רופאים ואחיות מומחים','חוויית טיפול איכותית ושביעות רצון גבוהה','חיזוק האמון בין המטופל לרופא','שימוש בכלים טכנולוגיים תומכי החלטה'],g:'להבטיח רפואה מקצועית, נגישה ואפקטיבית – שמייצרת ערך אמיתי ללקוחות.',noLabel:1},
+ {ic:'careheart',t:'שירות אכפתי, פרואקטיבי ומותאם לקהל היעד',i:'מאוחדת מטמיעה תפיסת שירות שמזהה את הצרכים הייחודיים של קהלים שונים ופועלת באופן יזום כדי לתת להם מענה מותאם.',l:['תהליכי שירות מסונכרנים ומותאמים למאפייני הלקוחות','פיתוח שירותים יזומים ופרואקטיביים','עיצוב ושיפור מתמיד של תשתיות השירות','חיזוק הממשק עם הלקוח והממשקים הפנימיים','שביעות רצון והמלצה גבוהה דרך יחס אישי והתאמה תרבותית'],g:'לעבור משירות תגובתי לשירות יוזם, מדויק ומותאם – שמייצר חוויית לקוח משמעותית.'},
+ {ic:'doctor',t:'הקופה המועדפת לצוותים רפואיים',i:'מאוחדת שואפת להיות הארגון שבו הצוותים הרפואיים בוחרים לעבוד – ולהישאר.',l:['תנאי העסקה תחרותיים והשקעה בפיתוח מקצועי ואישי','תהליכי קליטה איכותיים ותומכים','חיזוק תחושת השייכות והחיבור לארגון','שיפור שביעות רצון ואיזון עבודה-חיים','סביבת עבודה מקצועית, מכבדת ומקדמת'],g:'לחזק את המחויבות, המקצועיות והגאווה הארגונית – כבסיס למצוינות רפואית.',survey:1},
+ {ic:'maplocal',t:'מיקוד וחיזוק הפריסה והשירותים בקהילות ובאזורים בהם אנו חזקים',i:'מאוחדת ממקדת משאבים ומאמץ באזורים ובקהילות שבהם יש לה יתרון יחסי, במטרה להעמיק נוכחות ולהוביל בצמיחה.',l:['מיקוד ניהולי והקצאת משאבים מדויקת','חיזוק וזמינות שירותי הרפואה בקהילה','הרחבת פריסת מרכזי בריאות ומכונים','פיתוח מענים רפואיים גם מעבר לשעות הפעילות'],g:'להעמיק אחיזה באזורים חזקים, להגדיל נתח שוק ולבסס מובילות מקומית.'},
+ {ic:'plane',t:'להיות הבחירה הראשונה לעולים חדשים',i:'מאוחדת פועלת לבסס את מעמדה כקופה המועדפת על עולים חדשים, באמצעות שירותים מותאמים ותהליכי קליטה מדויקים.',l:['הצעת שירותים אטרקטיביים ומותאמים לעולים','תהליכי גיוס וקליטה ייעודיים','חיזוק שביעות רצון והמלצה בקהל זה','יצירת קשר מוקדם ומשמעותי עם העולה כבר בשלבי ההגעה'],g:'להעמיק אחיזה באזורים חזקים, להגדיל נתח שוק ולבסס מובילות מקומית.'},
+ {ic:'shieldplus',t:'שיפור השב"ן והתאמתו לקהלי היעד של הקופה',i:'מאוחדת פועלת לחזק את האטרקטיביות של השב"ן ולהפוך אותו למנוע שימור וצמיחה מרכזי.',l:['חיזוק תחושת התמורה ושביעות הרצון מהשב"ן','הרחבת שיעור ההצטרפות בכל הרבדים','הובלה בשירותים ייעודיים לילדים','התאמת שיווק והנגשה לחברה הערבית'],g:'למצב את השב"ן ככלי ערך מרכזי עבור הלקוחות וכמנוע נאמנות לקופה.'},
+ {ic:'apple',t:'קידום בריאות פרואקטיבי ואורח חיים בריא',i:'מאוחדת פועלת לעבור מגישה תגובתית לגישה יוזמת – לקדם בריאות עוד לפני הופעת מחלה.',l:['פעילות יזומה לשמירה על אורח חיים בריא','מסעות לקוח מותאמים להתמודדות ומניעה','תהליכים דיגיטליים פשוטים ונגישים','שיפור מדדי רפואה מונעת','מתן כלים ומידע מעשי ללקוחות'],g:'להוביל תפיסה של רפואה מונעת ולחזק את בריאות הלקוחות לאורך זמן.'},
+ {ic:'tooth',t:'מהפכה בשירות ברפואת השיניים',i:'מאוחדת פועלת לשדרג את חוויית השירות ברפואת השיניים ולהפוך אותה לחלק אינטגרלי ומשמעותי במסע הלקוח.',l:['שדרוג תשתיות ותהליכי עבודה דיגיטליים','הטמעת סטנדרט שירות אחיד וגבוה','שיפור זמינות ונראות השירות','הובלה במדדי זמני המתנה לילדים','חיזוק החיבור בין מרפאות השיניים למרפאת האם'],g:'להפוך את רפואת השיניים למנוע צמיחה ולחזק את שביעות הרצון והנאמנות של הלקוחות.'}
+];
+let di=0;const dseen=new Set();
+document.getElementById('dirnav').innerHTML=DIRS.map((d,i)=>`<button onclick="showDir(${i})">${String(i+1).padStart(2,'0')}</button>`).join('');
+function showDir(i){
+  di=i;dseen.add(i);const d=DIRS[i];
+  document.querySelectorAll('#dirnav button').forEach((b,k)=>{b.classList.toggle('on',k===i);b.classList.toggle('seen',dseen.has(k))});
+  document.getElementById('dircard').innerHTML=`<div class="dircard" style="animation:fadeIn .35s">
+    <div><div class="dirtitle"><span class="ico">${ICONS[d.ic]}</span><div class="bignum">${String(i+1).padStart(2,'0')}</div></div><h2 style="font-size:26px;margin-top:10px">${d.t}</h2><span class="uline"></span><p>${d.i}</p>
+    ${d.survey?`<button class="btn btn-o" style="padding:10px 18px;font-size:15px" onclick="openModal('m-survey')"><span class="bi">${WW(ICONS.chartup)}</span>לצפייה בסקר המחוברות לרופאים 2025</button>`:''}
+    ${i===DIRS.length-1?`<button class="btn btn-o pop-in" style="padding:11px 20px;font-size:15px" onclick="tab('strat',2)">איפה זה פוגש אותנו? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 6l-6 6 6 6"/></svg></button>`:''}</div>
+    <div style="display:flex;flex-direction:column">${d.noLabel?'':'<h3>המהלך כולל:</h3>'}<ul class="dots">${d.l.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <div class="goalbot"><div class="goal"><b>המטרה:</b> ${d.g}</div><img src="assets/robot-clean.png" alt=""></div></div></div>`;
+}
+function dir(s){showDir(Math.max(0,Math.min(DIRS.length-1,di+s)))}
+showDir(0);
+
+/* ============ workplan timeline / SMART ============ */
+document.querySelectorAll('.tl').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tl').forEach(x=>x.classList.remove('on'));t.classList.add('on')}));
+const SMART=[
+ {k:'S',en:'Specific',he:'ממוקד',d:'מוגדר בצורה מדויקת – מה רוצים להשיג.',no:'לשפר את השירות במרפאה',yes:'להעלות את ציון שביעות הרצון במרפאה מ־82 ל־87 עד סוף השנה'},
+ {k:'M',en:'Measurable',he:'מדיד',d:'כולל קריטריון ברור להשגת המטרה – מדד הצלחה בתחומי העשייה של העובד.',no:'לחזק את הקשר עם הצוות הרפואי',yes:'לקיים 6 מפגשי צוות מקצועיים במהלך השנה ולמדוד השתתפות של לפחות 80% מהצוות'},
+ {k:'A',en:'Actionable',he:'בר ביצוע',d:'בר השגה בלוחות הזמנים שהוגדרו ובאמצעים הקיימים.',no:'להפוך למרפאה מובילה באזור',yes:'להוסיף 2 ימי רפואה ייעודיים לילדים עד רבעון שלישי, בהתאם ליעד האסטרטגי'},
+ {k:'R',en:'Relevant',he:'רלוונטי',d:'מטרה / אתגר בעלי ערך לעובד ולארגון.',no:'לשדרג את עיצוב חדר ההמתנה',yes:'לקצר את זמן ההמתנה הממוצע ב־10%, כחלק מהתייעלות ושיפור חוויית השירות'},
+ {k:'T',en:'Time-bound',he:'מתוזמן',d:'תחום בזמן.',no:'להגדיל את מספר המבוטחים',yes:'להגדיל את מספר המבוטחים ב־3% עד סוף רבעון רביעי'}
+];
+document.getElementById('smartBtns').innerHTML=SMART.map((s,i)=>`<button onclick="smart(${i})"><b>${s.k}</b><span>${s.he}</span></button>`).join('');
+function smart(i){const s=SMART[i];document.querySelectorAll('#smartBtns button').forEach((b,k)=>b.classList.toggle('on',k===i));
+  document.getElementById('smartBody').innerHTML=`<div style="animation:fadeIn .3s"><h3 style="font-size:22px">${s.en} – ${s.he}</h3><p class="lead">${s.d}</p><div class="yesno"><div class="no"><b>✗ לא:</b>"${s.no}"</div><div class="yes"><b>✓ כן:</b>"${s.yes}"</div></div></div>`}
+smart(0);
+
+/* ============ procurement steps ============ */
+let s6=0;
+function nextStep6(){const st=document.querySelectorAll('.step6');if(s6<st.length){st[s6].classList.add('show');s6++}
+  if(s6>=st.length){const b=document.getElementById('stepBtn');b.textContent='התחלה מחדש';b.onclick=()=>{st.forEach(x=>x.classList.remove('show'));s6=0;b.textContent='הצעד הבא';b.onclick=nextStep6;nextStep6()}}}
+nextStep6();
+
+/* ============ performance stages ============ */
+function stage(el){document.querySelectorAll('.stg').forEach(s=>s.classList.toggle('on',s===el))}
+
+/* ============ rimon ============ */
+const RIMON=[
+ {t:'מדד הצמיחה',d:'הסרגל מציג את תנועת ההצטרפות והעזיבה של הלקוחות את הקופה.'},
+ {t:'מדד איכות השירות',d:'סרגל זה מתבונן בחוויית המטופל מזוויות שונות, מגוונות ומשלימות: אורכי התור בתחומי רפואה מובילים, זמני ההמתנה במרפאה, זמני הטיפול בפניות שירות, עידוד פעולות בערוצים דיגיטליים, וממצאי סקרי חוויית לקוח.<br><b>באמצעות מדדי איכות השירות נוכל להפנות קשב ניהולי ולחזק תחומים אותם נרצה לקדם.</b>'},
+ {t:'מדד איכות רפואית',d:'מדדים לאיתור מוקדם של מחלות – כגון סרטן, וכן פעילות התערבות במחלות שכיחות – כגון סוכרת. לצידם משוקפות פעולות פרואקטיביות לשמירה על אורח חיים בריא ומניעת תחלואה.'},
+ {t:'מדד יעילות כלכלית',d:'מדדי תקציב לצד מדדים המעודדים שימוש מושכל במשאבים. לדוגמה: עידוד הפניות למלר"ד מאוחדת במקום למיון, תיעדוף שירותים פנים-קופתיים וצירוף לקוחות לחתימה על הוראות קבע.'}
+];
+function rimon(i,el){document.querySelectorAll('.rimon .hot').forEach(h=>h.classList.toggle('on',h===el));const r=RIMON[i];
+  document.getElementById('rimonInfo').innerHTML=`<div style="animation:fadeIn .3s"><span class="kicker">מערכת רימון</span><h2>${r.t}</h2><span class="uline"></span><p>${r.d}</p></div>`}
+
+/* ============ data principles ============ */
+const PRINC=[
+ {t:'לחבר בין הנתון לאדם',s:'ולא להישאר במספרים',l:['אל תציגו רק נתונים – תנו להם הקשר','שאלו: מה עומד מאחורי הנתון?','איזו התנהגות / תהליך יצרו אותו?'],q:'זכרו: הנתונים הם סימפטום – לא הסיפור המלא',ic:'personchart'},
+ {t:'נתונים כבסיס לשיח',s:'לא ככלי שיפוט',l:['הציגו נתונים כדי לפתוח שיח, לא כדי "לתייג" עובדים','הימנעו משיח של האשמה – עברו לשיח של הבנה ושיפור','שלבו נתונים בשיחות משוב עם דוגמאות קונקרטיות'],q:'במקום: "התוצאה שלך נמוכה" – עדיף: "מה לדעתך מסביר את הנתון הזה? איך נוכל לשפר יחד?"',ic:'chat'},
+ {t:'התמקדו במדדים מרכזיים',s:'ולא "לטבוע בדוחות"',l:['בחרו מספר מצומצם של מדדים קריטיים לניהול (3–5)','הגדירו מה חשוב באמת להצלחה בתפקיד / ביחידה','חזרו אל אותם מדדים באופן עקבי'],q:'',ic:'target'},
+ {t:'יצרו שגרות ניהול',s:'סביב הנתונים',l:['שגרות ניהול קבועות הן כלי לבקרה והנעה'],q:'לדוגמה: ישיבת צוות שבועית עם סקירת מדדים קצרה, פגישות אישיות שמתייחסות גם לביצועים ולא רק לתחושה, מעקב חודשי אחרי מגמות, הדרכות מקצועיות וכו\'.',ic:'routine'},
+ {t:'הבליטו הצלחות',s:'לא רק פערים',l:['חפשו גם איפה הנתונים טובים','שתפו הצלחות בצוות ולמדו ממה שעובד'],q:'נתונים הם גם כלי להוקרה והנעה – לא רק לבקרה',ic:'trophy'}
+];
+let pi=0;
+document.getElementById('pnav').innerHTML=PRINC.map((p,i)=>`<button onclick="showP(${i})">${i+1}</button>`).join('');
+const WHITE=W;
+function showP(i){pi=i;const p=PRINC[i];
+  document.querySelectorAll('#pnav button').forEach((b,k)=>b.classList.toggle('on',k===i));
+  document.getElementById('pcard').innerHTML=`<div class="pslide" style="animation:fadeIn .35s"><div class="big">${WHITE(ICONS[p.ic])}</div><div style="flex:1">
+   <span class="kicker">איך עושים את זה נכון? · ${i+1} מתוך 5</span><h2 style="font-size:30px;margin:0">${p.t}</h2><p class="muted" style="font-size:20px;margin:2px 0 0">${p.s}</p><span class="uline"></span>
+   <ul class="dots">${p.l.map(x=>`<li style="font-size:18px">${x}</li>`).join('')}</ul>${p.q?`<div class="goal">${p.q}</div>`:''}</div></div>`;
+  document.getElementById('pPrev').disabled=i===0;document.getElementById('pNext').disabled=i===PRINC.length-1}
+function pr(s){showP(Math.max(0,Math.min(PRINC.length-1,pi+s)))}
+showP(0);
+
+/* ============ AI tools ============ */
+const AI_TOOLS=[
+ {id:'excel',n:'Excel',bg:'linear-gradient(135deg,#21a366,#107c41)',L:'X',tag:'אקסל שמדבר ניהולית',tint:'linear-gradient(160deg,#dff3e8,#c9e8d6)',doesL:'מה Copilot עושה:',does:['מסביר נתונים במילים','מזהה חריגים','מציע תובנות ניהוליות','בונה סיכום להנהלה'],p:['הסבר לי במילים פשוטות מה הנתונים בגיליון מראים. מה שלושת הממצאים החשובים ביותר למנהל?','זהה חריגות משמעותיות ביחס לממוצע והצג אותן בטבלה חדשה עם הסבר אפשרי.','האם יש יחידות / מרפאות / תקופות שחורגות בצורה עקבית? סכם בתובנות.','כתוב סיכום ניהולי: מה עובד טוב | מה מדאיג | איפה כדאי להתמקד בשיפור.','אם הייתי צריך להציג את הנתונים להנהלה – איזה 3 גרפים היית מציע ולמה?','הצע נוסחה לחישוב חריגה חודשית מהיעד והסבר במילים פשוטות מה היא עושה.','בנה עמודת עזר שמסווגת כל שורה ל: תקין / חריגה קלה / חריגה חמורה, על בסיס עמודות ____.']},
+ {id:'powerpoint',n:'PowerPoint',bg:'linear-gradient(135deg,#ed6c47,#c43e1c)',L:'P',tag:'ממסמך – למצגת מנהלים',tint:'linear-gradient(160deg,#fde7df,#f8d3c6)',doesL:'מה Copilot עושה:',does:['הופך מסמך למצגת','בונה מבנה נכון','מציע מסר מרכזי'],p:['הפוך את המסמך המצורף למצגת של 8 שקופיות לקהל מנהלים: בעיה, מצב קיים, פתרון, תועלות, סיכונים, צעדים הבאים.','צור שקופית אחת עם: מסר מרכזי, 3 נקודות מפתח, והערות דובר קצרות.','פשט את המצגת כך שכל שקופית תכיל מסר אחד ברור בלבד.','כתוב הערות דובר לכל שקופית כדי שאוכל להעביר הרצאה של 40–60 דקות.','בנה שקופית "עם מה יוצאים מההרצאה" (Takeaways) ב-3 בולטים.']},
+ {id:'word',n:'Word',bg:'linear-gradient(135deg,#2b7cd3,#185abd)',L:'W',tag:'מדף ריק – לטיוטה תוך דקה',tint:'linear-gradient(160deg,#e0ebfb,#cddff7)',doesL:'שימושים נפוצים:',does:['טיוטות נהלים','סיכום ועדות','ניסוח מחדש לקהל אחר'],p:['כתוב טיוטת נוהל קצרה בנושא: ____. מבנה: מטרה, תחולה, תהליך עבודה, חריגים, מדדי בקרה.','נסח מחדש את הטקסט הבא כך שיהיה ברור לאיש צוות רפואי, ללא ז\'רגון משפטי מיותר: [הדבק טקסט]','סכם את המסמך לעמוד אחד למנהלים, ובנוסף כתוב תקציר בן 5 שורות לצוות.','בדוק אם יש חזרות, חוסר בהירות או סתירות במסמך. הצע שיפורים ממוקדים.','השווה בין שתי גרסאות של מסמך והדגש שינויי משמעות (לא רק ניסוח).','תרגם את המסמך לאנגלית בטון מקצועי ושמור על המבנה (כותרות / רשימות).']},
+ {id:'outlook',n:'Outlook',bg:'linear-gradient(135deg,#28a8ea,#0f6cbd)',L:'O',tag:'לא קוראים שרשור – מקבלים החלטה',tint:'linear-gradient(160deg,#ddf0fb,#c8e5f7)',doesL:'מה Copilot עושה:',does:['סיכום שרשורי מייל','טיוטת תשובה חכמה','התאמת טון (רשמי / קצר / ניהולי)'],p:['סכם את שרשור המיילים הזה ל-5 נקודות. בסוף הוסף: (1) מה הוחלט (2) מה עדיין פתוח (3) מה נדרש ממני כמנהל.','בהתבסס על השרשור: הכן לי נקודות הכנה לפגישה – נושאים רגישים, שאלות צפויות והצעת החלטה.','נסח תשובה עניינית וקצרה שמאשרת את כיוון הפעולה, ומבקשת לוח זמנים ברור. טון: מקצועי, לא מתגונן.','כתוב שתי גרסאות לתשובה: (1) גרסה קצרה להנהלה (2) גרסה מפורטת לצוות המקצועי.','תן 3 ניסוחים חלופיים לאותו מייל: רשמי מאוד / חברי / אסרטיבי.']},
+ {id:'teams',n:'Teams',bg:'linear-gradient(135deg,#7b83eb,#4b53bc)',L:'T',tag:'פגישה שלא הולכת לאיבוד!',tint:'linear-gradient(160deg,#e6e7fb,#d5d7f6)',doesL:'מה Copilot עושה:',does:['מסכם פגישות','מזהה החלטות','מחלץ משימות ואחריות'],p:['סכם את הפגישה ל-5 נקודות עיקריות. הדגש החלטות, מחלוקות ונושאים שדורשים המשך טיפול.','חלץ מהפגישה רשימת משימות: משימה | אחראי | דדליין | סיכון אם לא מבוצע.','מה סוכם עד עכשיו ומה שני הנושאים הקריטיים שעליי להכיר?','מה ההחלטות שהתקבלו עד כה ומי התחייב לבצע מה?','מה נאמר על נושא X בצ\'אט של הפגישה? סכם בקצרה וציין מי אמר מה.']},
+ {id:'forms',n:'Forms',bg:'linear-gradient(135deg,#1fb5a7,#077568)',L:'F',tag:'כלי לבניית שאלונים פשוטים',tint:'linear-gradient(160deg,#dcf3f0,#c6e9e4)',doesL:'',does:[],p:['נסח לי 10 שאלות קצרות לסקר בנושא X, כולל שאלה פתוחה אחת.','הצע מבנה לטופס דיווח תקלות: שדות חובה, שדות רשות וסדר מילוי.','כתוב הודעת הזמנה למילוי סקר בטון ידידותי וקצר.']},
+ {id:'chatgpt',n:'ChatGPT',bg:'conic-gradient(from 200deg,#3f6bff,#24c08a,#f7c331,#f76b4a,#c64ad8,#3f6bff)',L:'✦',tag:'העוזר האישי שלכם!',tint:'linear-gradient(160deg,#e6ecff,#f6e6f6)',doesL:'',does:[],p:['עזור לי לתעדף את המשימות שלי לשבוע הקרוב. חלק ל: דחוף / חשוב / יכול לחכות.','סכם יתרונות וחסרונות של האפשרויות הבאות והצע כיוון פעולה מנומק: _____.','הכן אותי לשיחה מקצועית רגישה: מה חשוב להגיד, ממה להימנע, ואיך לשמור על טון ענייני.','הפוך את ההערות הבאות לסיכום מנהלים + הודעה קצרה לצוות: [הדבק]','הסבר את הנושא הבא בשפה פשוטה כך שכל עובד יבין: _____.','איפה דיברנו על נושא X? הבא 3 מקורות (מסמך / מייל / פגישה) ותמצית מכל מקור.','מצא את המסמך / הקובץ האחרון שכולל את המונח ____ והסבר בקצרה מה יש בו.','ספק לי תמונת מצב על פרויקט X: מה חדש, מה חסום, מה המשימות הפתוחות.','השווה בין שני הקבצים המצורפים והצג הבדלים מהותיים בטבלה.','סכם לי את המסמך המצורף ל-7 נקודות + המלצות.']}
+];
+const tdone=new Set();
+const ticon=t=>`<div class="ticon img"><img src="assets/tool-${t.id}.png" alt="${t.n}"></div>`;
+const TOOL_POS={excel:[278,126],powerpoint:[423,126],word:[569,126],outlook:[210,274],teams:[350,274],chatgpt:[494,273],forms:[638,274]};
+function renderTools(){document.getElementById('tools').innerHTML=AI_TOOLS.map(t=>`<button class="toolhot ${tdone.has(t.id)?'done':''}" style="left:${TOOL_POS[t.id][0]}px;top:${TOOL_POS[t.id][1]}px" onclick="go('ai-${t.id}')" aria-label="${t.n}"></button>`).join('');const all=AI_TOOLS.every(t=>tdone.has(t.id));document.querySelectorAll('#ai .homebtn').forEach(b=>b.classList.toggle('cta',all))}
+renderTools();
+document.getElementById('aiToolScreens').outerHTML=AI_TOOLS.map((t,i)=>{
+  const prev=AI_TOOLS[i-1],next=AI_TOOLS[i+1];
+  return `<section class="screen aitool" id="ai-${t.id}" data-title="כלי AI – ${t.n}">
+  <div class="bgsoft" style="background:radial-gradient(600px 400px at 10% 20%,#e7e3ff,transparent 70%),radial-gradient(600px 400px at 90% 90%,#e3ebff,transparent 70%),#f7f8fe"></div>
+  <div class="topbar"><img class="logo" src="assets/logo.png" alt="מאוחדת" onclick="go('home')"><div class="crumbs"><a onclick="go('home')">מרכז הניהול</a>›<a onclick="go('ai')">כלי AI</a>›<b>${t.n}</b></div><button class="homebtn" onclick="go('ai')">לכל הכלים</button></div>
+  <div class="aih"><h1>כלי <span class="aigrad">AI</span> לשיפור העבודה היומיומית</h1>
+    <div class="badge">${ticon(t)}<div><b>${t.n}</b><small>${t.tag}</small></div></div></div>
+  <img class="robot" src="assets/robot.png" alt="">
+  <div class="tipblob"><b>${ICONS.bulb}טיפ קטן</b>ככל שתנסחו שאלה מדויקת יותר – תקבלו תשובה טובה יותר.</div>
+  <div class="chatwin">
+    <div class="chatarea" style="background:${t.tint}">
+      ${t.does.length?`<div class="does"><b>${t.doesL}</b>${t.does.map(d=>`<span>${d}</span>`).join('')}</div>`:''}
+      <div class="plabel">פרומפטים לדוגמה – לחצו על פרומפט כדי להעתיק אותו:</div>
+      ${t.p.map((p,k)=>`<button class="prompt" onclick="pickPrompt(this,'${t.id}')"><i>${k+1}</i><span>${p}</span></button>`).join('')}
+    </div>
+    <div class="askbar"><div class="plus">+</div><div class="txt" id="ask-${t.id}">בחרו פרומפט מהרשימה...</div>
+      <button class="copy" onclick="copyPrompt('${t.id}')">⧉ העתקה</button><div class="send"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 19V5M6 11l6-6 6 6"/></svg></div></div>
+  </div>
+  <div class="toolnav">
+    ${next?`<button class="btn btn-g" style="padding:9px 16px;font-size:14px" onclick="go('ai-${next.id}')">${next.n} ←</button>`:''}
+    ${prev?`<button class="btn btn-g" style="padding:9px 16px;font-size:14px" onclick="go('ai-${prev.id}')">→ ${prev.n}</button>`:''}
+  </div>
+</section>`}).join('');
+function pickPrompt(b,id){b.parentNode.querySelectorAll('.prompt').forEach(p=>p.classList.toggle('on',p===b));const t=document.getElementById('ask-'+id);t.textContent=b.querySelector('span').textContent;t.classList.add('filled');copyPrompt(id)}
+function copyPrompt(id){const t=document.getElementById('ask-'+id);if(!t.classList.contains('filled')){toast('בחרו קודם פרומפט מהרשימה');return}
+  try{navigator.clipboard.writeText(t.textContent).then(()=>toast('הפרומפט הועתק ✓'),()=>toast('הפרומפט נבחר ✓'))}catch(e){toast('הפרומפט נבחר ✓')}}
+const _go=go;go=function(id){_go(id);if(id.startsWith('ai-')){tdone.add(id.slice(3));renderTools()}};
+
+paintIcons(document);
+updateProgress();
+</script>
+</body>
+</html>
